@@ -76,10 +76,10 @@ export default class DiscordClient extends Client {
     }
 
     //채널 생성시 봇 생성 채널 구분을 위해 무조건 storybot 카테고리에 넣습니다
-    createChannel(discordChannel, name){
-        var chan = discordChannel.Guild.createChannel(name);
+    async createChannel(discordChannel, name){
+        var chan = await discordChannel.Guild.createChannel(name);
 
-        chan.setParent(this.getBotCategory(discordChannel));
+        await chan.setParent(await this.getBotCategory(discordChannel));
 
         return new DiscordChannel(chan);
     }
@@ -88,12 +88,12 @@ export default class DiscordClient extends Client {
         return this.tempCategories.has(discordChannel.Guild);
     }
 
-    getBotCategory(discordChannel){
+    async getBotCategory(discordChannel){
         if (this.hasBotCategory(discordChannel))
             return this.tempCategories.get(discordChannel.Guild);
 
         //임시 채널 생성 시도
-        var category = discordChannel.Guild.createChannel('-- storybot --', 'category', null, null, '임시 채널용 카테고리가 필요해요!');
+        var category = await discordChannel.Guild.createChannel('-- storybot --', 'category', null, null, '임시 채널용 카테고리가 필요해요!');
         this.tempCategories.set(discordChannel.Guild, category);
 
         return category;

@@ -31,7 +31,7 @@ export default class Client extends EventEmitter {
     }
 
     //해당 채널의 멤버를 사용해 새 채널 생성
-    createChannel(channel, name){
+    async createChannel(channel, name){
 
     }
 
