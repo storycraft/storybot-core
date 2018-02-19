@@ -10,7 +10,7 @@
     "watch": "babel src --watch --out-dir dist"
   },
   "author": "storycraft",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "discord.js": "^11.3.0",
     "facebook-chat-api": "github:Schmavery/facebook-chat-api",
