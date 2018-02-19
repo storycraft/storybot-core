@@ -1,0 +1,40 @@
+import EventEmitter from 'events';
+
+/*
+ * 어떤 클라이언트의 이벤트 목록
+ * 
+ * initialize 완료시 ready 이벤트 발생
+ * 메세지 도착시 message 이벤트 발생
+ * 
+ */
+export default class Client extends EventEmitter {
+    constructor(){
+        this.ready = false;
+        this.initializing = false;
+    }
+
+    get Ready(){
+        return this.ready;
+    }
+
+    get Initializing(){
+        return this.initializing;
+    }
+
+    async getChannel(id){
+        return null;
+    }
+
+    //해당 채널의 멤버를 사용해 새 채널 생성
+    createChannel(channel, name){
+
+    }
+
+    async initialize(args){
+        
+    }
+
+    async sendMessage(str){
+
+    }
+}
