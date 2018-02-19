@@ -1,4 +1,6 @@
-export default class Channel {
+import EventEmitter from 'events';
+
+export default class Channel extends EventEmitter {
     constructor(client, id, name){
         this.client = client;
         this.id = id;
@@ -21,7 +23,7 @@ export default class Channel {
         return [/*User*/];
     }
 
-    async sendMessage(){
+    async send(msgTemplate){
 
     }
 }

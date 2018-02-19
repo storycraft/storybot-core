@@ -13,6 +13,8 @@ export default class DiscordClient extends Client {
 
         //임시 discord 카테고리들
         this.tempCategories = new Map();
+
+        this.channels = new Map();
     }
 
     /*
@@ -54,7 +56,23 @@ export default class DiscordClient extends Client {
     }
 
     onMessage(msg){
-        var message = DiscordMessage.fromRawDiscordMessage(msg);
+        var sourceChannel = this.getSource(msg);
+        var message = DiscordMessage.fromRawDiscordMessage(sourceChannel, msg);
+
+        sourceChannel.emit('message', message);
+
+        this.emit('message', message);
+    }
+
+    getSource(msg){
+        if (this.channels.has(msg.channel))
+            return this.channels.get(msg.channel);
+
+        let chan = new DiscordChannel(msg.channel);
+
+        this.channels.set(msg.channel, chan);
+
+        return chan;
     }
 
     //채널 생성시 봇 생성 채널 구분을 위해 무조건 storybot 카테고리에 넣습니다
@@ -92,6 +110,6 @@ export default class DiscordClient extends Client {
         }
 
         await Promise.all(tasks);
-        await this.DiscordClient.logout();
+        await this.DiscordClient.destroy();
     }
 }

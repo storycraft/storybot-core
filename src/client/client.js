@@ -11,6 +11,7 @@ export default class Client extends EventEmitter {
     constructor(){
         this.ready = false;
         this.initializing = false;
+        this.source = null;
     }
 
     get Ready(){
@@ -25,6 +26,10 @@ export default class Client extends EventEmitter {
         return null;
     }
 
+    get Source(){
+        return null;
+    }
+
     //해당 채널의 멤버를 사용해 새 채널 생성
     createChannel(channel, name){
 
@@ -34,7 +39,7 @@ export default class Client extends EventEmitter {
         
     }
 
-    async sendMessage(str){
+    async sendMessage(msgTemplate){
 
     }
 }

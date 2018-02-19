@@ -38,7 +38,7 @@ export default class UserMessage {
         return [];
     }
 
-    async edit(str, option){
+    async edit(msgTemplate){
         if (!this.Editable)
             throw new Error('이 메세지는 수정 할 수 없습니다.');
     }
@@ -46,12 +46,7 @@ export default class UserMessage {
     //reply 관련 메서드는 해당 메세지가 온 서버 또는 채널 또는 사용자에게 메세지를 전송하는 역할만 하면 됩니다
 
     //텍스트 전송
-    async reply(str, option){
-        throw new Error('이 메세지에 답 할수 없습니다.');
-    }
-
-    //첨부파일 전송
-    async replyAttachment(messageAttachment){
+    async reply(msgTemplate){
         throw new Error('이 메세지에 답 할수 없습니다.');
     }
 }

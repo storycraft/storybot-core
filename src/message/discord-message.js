@@ -21,10 +21,6 @@ export default class DiscordMessage extends UserMessage {
         return this.RawMessage.content;
     }
 
-    get Source(){
-        return null;
-    }
-
     get Timestamp(){
         return new Date(this.RawMessage.createdTimestamp);
     }
@@ -45,25 +41,22 @@ export default class DiscordMessage extends UserMessage {
         return this.RawMessage.edits;
     }
 
-    async edit(str, option){
+    async edit(msgTemplate){
         //에딧 가능한지 부터 검사하는게 좋겠죠
         super.edit(str, option);
 
-        return DiscordMessage.fromRawDiscordMessage(await this.RawMessage.edit(str, option));
+        return DiscordMessage.fromRawDiscordMessage(await this.RawMessage.edit(msgTemplate.Text));
     }
 
-    async reply(str, option){
-        //해당 메세지에 답한 후 새 DiscordMessage객체 반환
-        return DiscordMessage.fromRawDiscordMessage(await this.RawMessage.reply(str, option));
+    async reply(msgTemplate){
+        return await this.Source.send(msgTemplate);
     }
 
-    async replyAttachment(messageAttachment){
-        throw new Error('이 메세지에 답 할수 없습니다.');
-    }
-
-    static fromRawDiscordMessage(msg){
+    static fromRawDiscordMessage(sourceChannel, msg){
         let user = DiscordUser.fromDiscordUser(msg.author);
         let message = new DiscordMessage(msg, user);
+
+        message.source = sourceChannel;
 
         return message;
     }
