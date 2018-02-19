@@ -11,7 +11,7 @@ export default class Bot extends EventEmitter {
     async initialize(settings){
         var tasks = [];
 
-        if (settings.discord.enabled == true){
+        if (settings.discord.enabled){
             this.discord = new DiscordClient();
 
             this.discord.on('message', this.onMessage.bind(this));
@@ -19,11 +19,11 @@ export default class Bot extends EventEmitter {
             tasks.push(this.discord.initialize(settings.discord.userToken));
         }
 
-        if (settings.line.enabled == true){
+        if (settings.line.enabled){
             //TODO
         }
 
-        if (settings.line.enabled == true){
+        if (settings.line.enabled){
             //TODO
         }
 
