@@ -31,9 +31,11 @@ export default class DiscordChannel extends Channel {
 
         if (msgTemplate.Text){
             //텍스트 입력 효과
-            this.TextChannel.startTyping(msgTemplate.Text.length);
+            this.TextChannel.startTyping();
 
             await this.TextChannel.send(msgTemplate.Text);
+
+            this.TextChannel.stopTyping();
         }
 
         for(let attachment of msgTemplate.Attachments){
