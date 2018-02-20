@@ -1,6 +1,8 @@
 import DiscordClient from './client/discord-client';
 import { EventEmitter } from 'events';
 
+import { MessageTemplate, Attachment as MessageAttachment } from './message/template/message-template';
+
 export default class Bot extends EventEmitter {
     constructor(){
         this.discord = null;
@@ -48,3 +50,5 @@ export default class Bot extends EventEmitter {
         EventEmitter.emit('message', msg);
     }
 }
+
+export { MessageTemplate, MessageAttachment }

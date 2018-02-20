@@ -2,12 +2,13 @@
   "name": "story-bot-core",
   "version": "1.0.0",
   "description": "story bot core part",
-  "main": "dist/main.js",
+  "main": "src/bot.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node dist\\main.js",
-    "build": "babel src --out-dir dist",
-    "watch": "babel src --watch --out-dir dist"
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/storycraft/storybot-core.git"
   },
   "author": "storycraft",
   "license": "MIT",
@@ -16,5 +17,7 @@
     "facebook-chat-api": "github:Schmavery/facebook-chat-api",
     "linebot": "^1.4.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "mocha": "^5.0.1"
+  }
 }
