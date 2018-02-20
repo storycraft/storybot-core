@@ -24,16 +24,12 @@ export default class Client extends EventEmitter {
         return this.initializing;
     }
 
-    async getChannel(id){
-        return null;
-    }
-
     get Source(){
         return null;
     }
 
-    //해당 채널의 멤버를 사용해 새 채널 생성
-    async createChannel(channel, name){
+    //해당 채널의 멤버를 사용해 그룹 채널 생성
+    async createChannel(name){
 
     }
 

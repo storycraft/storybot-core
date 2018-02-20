@@ -1,41 +1,83 @@
 import Channel from './channel';
-import Discord from 'discord.js';
+import { Attachment, DMChannel, GroupDMChannel } from 'discord.js';
+import MessageTemplate from '../message/template/message-template';
 
 export default class DiscordChannel extends Channel {
     
-    //Discord DM 그룹챗에는 봇을 초대할수 없습니다
-    constructor(guildChannel){
-        super(guildChannel.client, guildChannel.id, guildChannel.name);
-        this.guildChannel = guildChannel;
+    constructor(client, textChannel){
+        super(client, textChannel.id, textChannel.name);
+        this.textChannel = textChannel;
     }
 
-    get GuildChannel(){
-        return this.guildChannel;
-    }
-
-    get Guild(){
-        return this.GuildChannel.guild;
+    get TextChannel(){
+        return this.textChannel;
     }
 
     async getMembers(){
-        let guild = this.Guild;
-
         var members = [];
 
-        for (let [snowflake, guildMember] of guild.members){
-            members.push(members);
+        for (let [snowflake, member] of this.TextChannel.members){
+            members.push(this.Client.getWrappedUser(member));
         }
 
         return members;
     }
 
     async send(msgTemplate){
+        //msgTemplate이 문자열일경우 문자열로 전송
+        if (typeof(msgTemplate) == 'string'){
+            msgTemplate = new MessageTemplate(msgTemplate);
+        }
+
         //해당 메세지에 답한 후 새 DiscordMessage객체 반환
         if (msgTemplate.Text)
-            await this.guildChannel.send(msgTemplate.Text);
+            await this.TextChannel.send(msgTemplate.Text);
 
         for(let attachment of msgTemplate.Attachments){
-            await this.guildChannel.send(null, new Discord.Attachment(attachment.Buffer, attachment.Name));
+            await this.TextChannel.send(null, new Attachment(attachment.Buffer, attachment.Name));
+        }
+    }
+}
+
+export class DiscordDMChannel extends DiscordChannel {
+    
+    constructor(client, textChannel){
+        super(client, textChannel);
+    }
+
+    //1대 1 DM 채널인지 체크
+    get IsPMChannel(){
+        return this.TextChannel instanceof DMChannel;
+    }
+
+    //그룹 DM 채널인지 체크
+    get IsGroupChannel(){
+        return this.TextChannel instanceof GroupDMChannel;
+    }
+
+    async addUser(user, customNick){
+        if (this.IsPMChannel){
+            throw new Error('Cannot add user to PMChannel');
+        }
+
+        this.TextChannel.addUser(user.DiscordUser, customNick);
+    }
+
+    async getMembers(){
+        if (this.IsGroupChannel){
+            return [ this.Client.getWrappedUser(this.TextChannel.recipient) ];
+        }
+        else if (this.IsSingleChannel){
+            var members = [];
+
+            for (let [snowflake, member] of this.TextChannel.recipients){
+                members.push(this.Client.getWrappedUser(member));
+            }
+
+            return members;
+        }
+        else{
+            throw new Error('Unknown Discord Channel ' + this.TextChannel);
         }
     }
 }

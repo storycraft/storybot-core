@@ -3,7 +3,8 @@ import Client from './client';
 import Discord from 'discord.js';
 import DiscordUser from '../user/discord-user';
 import DiscordMessage from '../message/discord-message';
-import DiscordChannel from '../channel/discord-channel';
+import DiscordChannel, { DiscordDMChannel } from '../channel/discord-channel';
+import discordUser from '../user/discord-user';
 
 export default class DiscordClient extends Client {
     constructor(){
@@ -11,10 +12,8 @@ export default class DiscordClient extends Client {
         //내부 discord.js 객체
         this.discord = null;
 
-        //임시 discord 카테고리들
-        this.tempCategories = new Map();
-
         this.channels = new Map();
+        this.users = new Map();
     }
 
     /*
@@ -28,7 +27,7 @@ export default class DiscordClient extends Client {
             throw new Error('해당 클라이언트는 이미 활성화 되어있거나 초기화 중입니다');
         this.initializing = true;
         
-        this.discord = new Discord();
+        this.discord = new Discord.Client();
         
         //리스너 연결
         this.DiscordClient.on('ready', this.onReady.bind(this));
@@ -43,13 +42,49 @@ export default class DiscordClient extends Client {
         return obj;
     }
 
-    async getChannel(id){
-        return null;
-    }
-
     get DiscordClient(){
         return this.discord;
     }
+
+    get DiscordUser(){
+        return this.DiscordClient.user;
+    }
+
+    //Discord User 관련 부분 시작
+
+    get UserName(){
+        return this.DiscordUser.username;
+    }
+
+    async setUserName(name){
+        await this.DiscordUser.setUsername(name);
+    }
+
+    get Avatar(){
+        return this.DiscordUser.avatarURL;
+    }
+
+    async setAvatar(buffer){
+        await this.DiscordUser.setAvatar(buffer);
+    }
+
+    get Status(){
+        return this.DiscordUser.avatarURL;
+    }
+
+    async setStatus(statusString){
+        await this.DiscordUser.setStatus(statusString);
+    }
+
+    get Presence(){
+        return this.DiscordUser.presence;
+    }
+
+    async setPresence(rawPresenceData){
+        await this.DiscordUser.setPresence(rawPresenceData);
+    }
+
+    //Discord User 관련 부분 끝
 
     onReady(){
         this.emit('ready');
@@ -57,9 +92,11 @@ export default class DiscordClient extends Client {
 
     onMessage(msg){
         var sourceChannel = this.getSource(msg);
-        var message = DiscordMessage.fromRawDiscordMessage(sourceChannel, msg);
+        var user = this.getWrappedUser(msg.author);
+        var message = DiscordMessage.fromRawDiscordMessage(sourceChannel, user, msg);
 
         sourceChannel.emit('message', message);
+        user.emit('message', message);
 
         this.emit('message', message);
     }
@@ -68,48 +105,40 @@ export default class DiscordClient extends Client {
         if (this.channels.has(msg.channel))
             return this.channels.get(msg.channel);
 
-        let chan = new DiscordChannel(msg.channel);
+        var chan = null;
+
+        if (msg.channel.type == 'text')
+            chan = new DiscordChannel(this, msg.channel);
+        else if (msg.channel.type == 'dm' || msg.channel.type == 'group')
+            chan = new DiscordDMChannel(this, msg.channel);
 
         this.channels.set(msg.channel, chan);
 
         return chan;
     }
 
-    //채널 생성시 봇 생성 채널 구분을 위해 무조건 storybot 카테고리에 넣습니다
-    async createChannel(discordChannel, name){
-        var chan = await discordChannel.Guild.createChannel(name);
+    getWrappedUser(user){
+        if (this.users.has(user))
+            return this.users.get(user);
 
-        await chan.setParent(await this.getBotCategory(discordChannel));
+        let wrappedUser = DiscordUser.fromDiscordUser(user);
 
-        return new DiscordChannel(chan);
+        this.users.set(user, wrappedUser);
+
+        return wrappedUser;
     }
 
-    hasBotCategory(discordChannel){
-        return this.tempCategories.has(discordChannel.Guild);
-    }
+    //해당 네임으로 DM 그룹쳇 생성
+    async createChannel(name){
+        var chan = await this.DiscordUser.createGroupDM(name);
 
-    async getBotCategory(discordChannel){
-        if (this.hasBotCategory(discordChannel))
-            return this.tempCategories.get(discordChannel.Guild);
-
-        //임시 채널 생성 시도
-        var category = await discordChannel.Guild.createChannel('-- storybot --', 'category', null, null, '임시 채널용 카테고리가 필요해요!');
-        this.tempCategories.set(discordChannel.Guild, category);
-
-        return category;
+        return new DiscordDMChannel(chan);
     }
 
     async destroy(){
         if (!this.Ready)
             return;
 
-        //만든 쓰레기들 제거
-        let tasks = [];
-        for (let [guild, category] of this.tempCategories){
-            tasks.push(category.delete('필요 없을듯 ㅇㅇ'));
-        }
-
-        await Promise.all(tasks);
         await this.DiscordClient.destroy();
     }
 }

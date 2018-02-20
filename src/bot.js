@@ -5,6 +5,8 @@ import { MessageTemplate, Attachment as MessageAttachment } from './message/temp
 
 export default class Bot extends EventEmitter {
     constructor(){
+        super();
+        
         this.discord = null;
         this.line = null;
         this.facebookMessenger = null;
@@ -31,7 +33,7 @@ export default class Bot extends EventEmitter {
 
         await Promise.all(tasks);
 
-        EventEmitter.emit('ready');
+        this.emit('ready');
     }
 
     get DiscordClient(){
@@ -47,7 +49,7 @@ export default class Bot extends EventEmitter {
     }
 
     onMessage(msg){
-        EventEmitter.emit('message', msg);
+        this.emit('message', msg);
     }
 }
 

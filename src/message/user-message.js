@@ -7,6 +7,7 @@ export default class UserMessage {
      */
     cosntructor(user){
         this.user = user;
+        this.source = null;
     }
     
     get User(){
@@ -15,7 +16,7 @@ export default class UserMessage {
 
     //메세지를 보낸곳 DM일경우 User, 그룹챗일경우 Channel 반환
     get Source(){
-        return null;
+        return this.source;
     }
 
     get Message(){

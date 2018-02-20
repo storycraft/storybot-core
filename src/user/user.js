@@ -1,8 +1,10 @@
+import { EventEmitter } from "events";
+
 //여러 클라이언트 간 통합 user 클래스
 
-export default class User {
+export default class User extends EventEmitter {
     constructor() {
-
+        super();
     }
 
     get Id(){

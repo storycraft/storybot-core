@@ -1,5 +1,4 @@
 import UserMessage from "./user-message";
-import DiscordUser from "../user/discord-user";
 
 export default class DiscordMessage extends UserMessage {
     constructor(rawMessage, user){
@@ -45,15 +44,18 @@ export default class DiscordMessage extends UserMessage {
         //에딧 가능한지 부터 검사하는게 좋겠죠
         super.edit(str, option);
 
-        return DiscordMessage.fromRawDiscordMessage(await this.RawMessage.edit(msgTemplate.Text));
+        if (typeof(msgTemplate) == 'string'){
+            msgTemplate = new MessageTemplate(msgTemplate);
+        }
+
+        await this.RawMessage.edit(msgTemplate.Text);
     }
 
     async reply(msgTemplate){
-        return await this.Source.send(msgTemplate);
+        await this.Source.send(msgTemplate);
     }
 
-    static fromRawDiscordMessage(sourceChannel, msg){
-        let user = DiscordUser.fromDiscordUser(msg.author);
+    static fromRawDiscordMessage(sourceChannel, user, msg){
         let message = new DiscordMessage(msg, user);
 
         message.source = sourceChannel;
