@@ -29,9 +29,12 @@ export default class DiscordChannel extends Channel {
             msgTemplate = new MessageTemplate(msgTemplate);
         }
 
-        //해당 메세지에 답한 후 새 DiscordMessage객체 반환
-        if (msgTemplate.Text)
+        if (msgTemplate.Text){
+            //텍스트 입력 효과
+            this.TextChannel.startTyping(msgTemplate.Text.length);
+
             await this.TextChannel.send(msgTemplate.Text);
+        }
 
         for(let attachment of msgTemplate.Attachments){
             await this.TextChannel.send(null, new Attachment(attachment.Buffer, attachment.Name));
