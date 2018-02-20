@@ -2,6 +2,8 @@ import EventEmitter from 'events';
 
 export default class Channel extends EventEmitter {
     constructor(client, id, name){
+        super();
+        
         this.client = client;
         this.id = id;
         this.name = name;

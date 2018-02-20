@@ -9,6 +9,8 @@ import EventEmitter from 'events';
  */
 export default class Client extends EventEmitter {
     constructor(){
+        super();
+
         this.ready = false;
         this.initializing = false;
         this.source = null;
