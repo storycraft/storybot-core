@@ -36,6 +36,7 @@ export default class DiscordChannel extends Channel {
             let sendQueue = this.TextChannel.send(msgTemplate.Text);
 
             this.TextChannel.stopTyping();
+            
             await sendQueue;
         }
 
