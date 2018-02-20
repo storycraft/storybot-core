@@ -16,9 +16,5 @@
     "facebook-chat-api": "github:Schmavery/facebook-chat-api",
     "linebot": "^1.4.1"
   },
-  "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
-    "babel-polyfill": "^6.26.0"
-  }
+  "devDependencies": {}
 }
