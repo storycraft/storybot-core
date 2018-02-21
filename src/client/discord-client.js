@@ -102,8 +102,8 @@ export default class DiscordClient extends Client {
     }
 
     getSource(msg){
-        if (this.channels.has(msg.channel))
-            return this.channels.get(msg.channel);
+        if (this.channels.has(msg.channel.id))
+            return this.channels.get(msg.channel.id);
 
         var chan = null;
 
@@ -112,18 +112,18 @@ export default class DiscordClient extends Client {
         else if (msg.channel.type == 'dm' || msg.channel.type == 'group')
             chan = new DiscordDMChannel(this, msg.channel);
 
-        this.channels.set(msg.channel, chan);
+        this.channels.set(msg.channel.id, chan);
 
         return chan;
     }
 
     getWrappedUser(user){
-        if (this.users.has(user))
-            return this.users.get(user);
+        if (this.users.has(user.id))
+            return this.users.get(user.id);
 
         let wrappedUser = DiscordUser.fromDiscordUser(user);
 
-        this.users.set(user, wrappedUser);
+        this.users.set(user.id, wrappedUser);
 
         return wrappedUser;
     }

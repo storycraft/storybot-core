@@ -29,6 +29,8 @@ export default class DiscordChannel extends Channel {
             msgTemplate = new MessageTemplate(msgTemplate);
         }
 
+        var messages = [];
+
         if (msgTemplate.Text){
             //텍스트 입력 효과
             this.TextChannel.startTyping();
@@ -37,12 +39,14 @@ export default class DiscordChannel extends Channel {
 
             this.TextChannel.stopTyping();
             
-            await sendQueue;
+            messages.push(await sendQueue);
         }
 
         for(let attachment of msgTemplate.Attachments){
-            await this.TextChannel.send(null, new Attachment(attachment.Buffer, attachment.Name));
+            messages.push(await this.TextChannel.send(null, new Attachment(attachment.Buffer, attachment.Name)));
         }
+
+        return messages;
     }
 }
 

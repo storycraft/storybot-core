@@ -48,11 +48,11 @@ export default class DiscordMessage extends UserMessage {
             msgTemplate = new MessageTemplate(msgTemplate);
         }
 
-        await this.RawMessage.edit(msgTemplate.Text);
+        return new DiscordMessage(await this.RawMessage.edit(msgTemplate.Text), this.User);
     }
 
     async reply(msgTemplate){
-        await this.Source.send(msgTemplate);
+        return await this.Source.send(msgTemplate);
     }
 
     static fromRawDiscordMessage(sourceChannel, user, msg){

@@ -11,6 +11,9 @@ export default class LineClient extends Client {
         this.line = null;
         //http 서버
         this.server = null;
+
+        this.users = new Map();
+
     }
 
     /*
@@ -53,7 +56,18 @@ export default class LineClient extends Client {
     }
 
     onMessage(e){
+        var user = this.getWrappedUser(e.source.profile());
+    }
 
+    getWrappedUser(userId){
+        if (this.users.has(userId))
+            return this.users.get(userId);
+
+        let user = LineUser.fromUserId(userId);
+
+        this.users.set(userId, user);
+
+        return user;
     }
 
     async destroy(){

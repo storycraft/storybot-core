@@ -26,6 +26,6 @@ export default class Channel extends EventEmitter {
     }
 
     async send(msgTemplate){
-
+        return [];
     }
 }
