@@ -48,10 +48,7 @@ export default class DiscordMessage extends UserMessage {
             msgTemplate = new MessageTemplate(msgTemplate);
         }
 
-        let message = new DiscordMessage(await this.RawMessage.edit(msgTemplate.Text), this.User);
-        message.source = this.Source;
-
-        return message;
+        return DiscordMessage.fromRawDiscordMessage(this.Source, this.User, await this.RawMessage.edit(msgTemplate.Text));
     }
 
     async reply(msgTemplate){
