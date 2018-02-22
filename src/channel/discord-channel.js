@@ -1,6 +1,7 @@
 import Channel from './channel';
 import { Attachment, DMChannel, GroupDMChannel } from 'discord.js';
 import MessageTemplate from '../message/template/message-template';
+import DiscordMessage from '../message/discord-message';
 
 export default class DiscordChannel extends Channel {
     
@@ -39,11 +40,16 @@ export default class DiscordChannel extends Channel {
 
             this.TextChannel.stopTyping();
             
-            messages.push(await sendQueue);
+            let msg = new DiscordMessage(await sendQueue, this.Client.getWrappedUser(this.Client.DiscordUser));
+            msg.source = this;
+            messages.push(msg);
         }
 
         for(let attachment of msgTemplate.Attachments){
-            messages.push(await this.TextChannel.send(null, new Attachment(attachment.Buffer, attachment.Name)));
+            let msg = new DiscordMessage(await this.TextChannel.send(null, new Attachment(attachment.Buffer, attachment.Name)), this.Client.getWrappedUser(this.Client.DiscordUser));
+            msg.source = this;
+            
+            messages.push(msg);
         }
 
         return messages;
