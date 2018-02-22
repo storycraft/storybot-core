@@ -1,4 +1,5 @@
 import UserMessage from "./user-message";
+import MessageTemplate from "./template/message-template";
 
 export default class DiscordMessage extends UserMessage {
     constructor(rawMessage, user){
