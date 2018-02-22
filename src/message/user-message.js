@@ -50,6 +50,11 @@ export default class UserMessage {
     async reply(msgTemplate){
         throw new Error('이 메세지에 답 할수 없습니다.');
     }
+
+    async delete(){
+        if (!this.Deleteable)
+            throw new Error('이 메세지는 삭제 할 수 없습니다.');
+    }
 }
 
 export class MessageAttachment {

@@ -55,6 +55,13 @@ export default class DiscordMessage extends UserMessage {
         return await this.Source.send(msgTemplate);
     }
 
+    async delete(){
+        //제거 가능 확인
+        super.delete();
+
+        await this.RawMessage.delete();
+    }
+
     static fromRawDiscordMessage(sourceChannel, user, msg){
         let message = new DiscordMessage(msg, user);
 
