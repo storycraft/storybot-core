@@ -42,7 +42,7 @@ export default class DiscordMessage extends UserMessage {
 
     async edit(msgTemplate){
         //에딧 가능한지 부터 검사하는게 좋겠죠
-        super.edit(str, option);
+        super.edit(msgTemplate);
 
         if (typeof(msgTemplate) == 'string'){
             msgTemplate = new MessageTemplate(msgTemplate);
