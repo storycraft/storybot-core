@@ -36,6 +36,8 @@ export default class DiscordClient extends Client {
         //제공된 토큰을 사용하여 비동기 로그인
         var obj = await this.DiscordClient.login(token);
 
+        this.user = this.getWrappedUser(this.DiscordClient.user);
+
         this.initializing = false;
         this.ready = true;
 
@@ -47,41 +49,41 @@ export default class DiscordClient extends Client {
     }
 
     get DiscordUser(){
-        return this.DiscordClient.user;
+        return this.user;
     }
 
     //Discord User 관련 부분 시작
 
     get UserName(){
-        return this.DiscordUser.username;
+        return this.DiscordUser.DiscordUser.username;
     }
 
     async setUserName(name){
-        await this.DiscordUser.setUsername(name);
+        await this.DiscordUser.DiscordUser.setUsername(name);
     }
 
     get Avatar(){
-        return this.DiscordUser.avatarURL;
+        return this.DiscordUser.DiscordUser.avatarURL;
     }
 
     async setAvatar(buffer){
-        await this.DiscordUser.setAvatar(buffer);
+        await this.DiscordUser.DiscordUser.setAvatar(buffer);
     }
 
     get Status(){
-        return this.DiscordUser.avatarURL;
+        return this.DiscordUser.DiscordUser.avatarURL;
     }
 
     async setStatus(statusString){
-        await this.DiscordUser.setStatus(statusString);
+        await this.DiscordUser.DiscordUser.setStatus(statusString);
     }
 
     get Presence(){
-        return this.DiscordUser.presence;
+        return this.DiscordUser.DiscordUser.presence;
     }
 
     async setPresence(rawPresenceData){
-        await this.DiscordUser.setPresence(rawPresenceData);
+        await this.DiscordUser.DiscordUser.setPresence(rawPresenceData);
     }
 
     //Discord User 관련 부분 끝
@@ -130,7 +132,7 @@ export default class DiscordClient extends Client {
 
     //해당 네임으로 DM 그룹쳇 생성
     async createChannel(name){
-        var chan = await this.DiscordUser.createGroupDM(name);
+        var chan = await this.DiscordUser.DiscordUser.createGroupDM(name);
 
         return new DiscordDMChannel(chan);
     }
