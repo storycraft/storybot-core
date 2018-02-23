@@ -1,5 +1,6 @@
 import UserMessage from "./user-message";
 import MessageTemplate from "./template/message-template";
+import DiscordClient from "../client/discord-client";
 
 export default class DiscordMessage extends UserMessage {
     constructor(rawMessage, user){
@@ -42,6 +43,9 @@ export default class DiscordMessage extends UserMessage {
     }
 
     isMentioned(discordUser){
+        if (discordUser instanceof DiscordClient)
+            return this.RawMessage.isMentioned(discordUser.DiscordClient.DiscordUser);
+
         return this.RawMessage.isMentioned(discordUser.DiscordUser);
     }
 

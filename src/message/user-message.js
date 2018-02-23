@@ -39,6 +39,7 @@ export default class UserMessage {
         return [];
     }
 
+    //user parameter can be User Object or Bot Object
     isMentioned(user){
         return false;
     }
