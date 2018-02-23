@@ -1,6 +1,6 @@
 import UserMessage from "./user-message";
 import MessageTemplate from "./template/message-template";
-import DiscordClient from "../client/discord-client";
+import Bot from "../bot";
 
 export default class DiscordMessage extends UserMessage {
     constructor(rawMessage, user){
@@ -43,8 +43,9 @@ export default class DiscordMessage extends UserMessage {
     }
 
     isMentioned(discordUser){
-        if (discordUser instanceof DiscordClient)
-            return this.RawMessage.isMentioned(discordUser.DiscordClient.DiscordUser);
+        if (discordUser instanceof Bot){
+            return this.RawMessage.isMentioned(discordUser.DiscordClient.DiscordUser.DiscordUser);
+        }
 
         return this.RawMessage.isMentioned(discordUser.DiscordUser);
     }
