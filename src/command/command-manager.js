@@ -1,12 +1,12 @@
 import { EventEmitter } from "events";
 
 export default class CommandManager extends EventEmitter {
-    constructor(bot,commandPrefix){
+    constructor(bot){
         super();
 
         this.bot = bot;
         
-        this.commandPrefix = commandPrefix;
+        this.commandPrefix = '*';
 
         this.commandInfoList = [];
 

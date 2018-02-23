@@ -12,7 +12,7 @@ export default class Bot extends EventEmitter {
         this.line = null;
         this.facebookMessenger = null;
 
-        this.commandManager = null;
+        this.commandManager = new CommandManager(this);
     }
 
     get CommandManager(){
@@ -22,7 +22,8 @@ export default class Bot extends EventEmitter {
     async initialize(settings){
         var tasks = [];
 
-        this.commandManager = new CommandManager(this, settings['command-prefix'] || '*'/*값이 없을경우 기본값 설정*/);
+        if (settings['command-prefix'])//설정 존재시 덮어씌우기
+            this.commandManager.commandPrefix = settings['command-prefix'];
 
         if (settings.discord.enabled){
             this.discord = new DiscordClient();
