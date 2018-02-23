@@ -41,6 +41,10 @@ export default class DiscordMessage extends UserMessage {
         return this.RawMessage.edits;
     }
 
+    isMentioned(discordUser){
+        return this.RawMessage.isMentioned(discordUser.DiscordUser);
+    }
+
     async edit(msgTemplate){
         //에딧 가능한지 부터 검사하는게 좋겠죠
         super.edit(msgTemplate);

@@ -25,5 +25,7 @@ export default {
 
         "email": "",
         "password": "",
-    }
+    },
+
+    "command-prefix": "*"
 }

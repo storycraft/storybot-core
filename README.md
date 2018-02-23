@@ -1,5 +1,6 @@
 # StoryBot
 
+**THIS PROJECT IS STILL DEVELOPING, API CAN CHANGE** 
 스토리 봇치 
 ㅁㄴ
 

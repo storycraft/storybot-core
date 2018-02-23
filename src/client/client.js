@@ -40,4 +40,8 @@ export default class Client extends EventEmitter {
     async sendMessage(msgTemplate){
 
     }
+
+    async destroy(){
+        
+    }
 }

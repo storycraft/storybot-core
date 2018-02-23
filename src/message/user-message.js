@@ -39,6 +39,10 @@ export default class UserMessage {
         return [];
     }
 
+    isMentioned(user){
+        return false;
+    }
+
     async edit(msgTemplate){
         if (!this.Editable)
             throw new Error('이 메세지는 수정 할 수 없습니다.');

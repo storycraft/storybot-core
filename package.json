@@ -1,8 +1,8 @@
 {
   "name": "storybot-core",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "story bot core part",
-  "main": "./dist/bot.js",
+  "main": "./dist/index.js",
   "scripts": {
     "test": "mocha",
     "build": "babel src -d dist",
