@@ -43,7 +43,7 @@ export default class DiscordChannel extends Channel {
         }
 
         for(let attachment of msgTemplate.Attachments){
-            messages.push(DiscordMessage.fromRawDiscordMessage(this, this.Client.getWrappedUser(this.Client.DiscordUser), await this.TextChannel.send(null, new Attachment(attachment.Buffer, attachment.Name))));
+            messages.push(DiscordMessage.fromRawDiscordMessage(this, this.Client.getWrappedUser(this.Client.DiscordUser), await this.TextChannel.send('', new Attachment(attachment.Buffer, attachment.Name))));
         }
 
         return messages;
