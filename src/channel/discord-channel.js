@@ -32,14 +32,13 @@ export default class DiscordChannel extends Channel {
 
         var messages = [];
 
+        //텍스트 입력 효과
         if (msgTemplate.Text){
-            //텍스트 입력 효과
             this.TextChannel.startTyping();
 
-            let sendQueue = this.TextChannel.send(msgTemplate.Text);
+            let sendQueue = this.TextChannel.send(msgTemplate.Text || '');
 
             this.TextChannel.stopTyping();
-            
             messages.push(DiscordMessage.fromRawDiscordMessage(this, this.Client.getWrappedUser(this.Client.DiscordUser), await sendQueue));
         }
 

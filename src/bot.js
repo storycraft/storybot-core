@@ -1,8 +1,8 @@
 import DiscordClient from './client/discord-client';
 import { EventEmitter } from 'events';
 
-import { MessageTemplate, Attachment as MessageAttachment } from './message/template/message-template';
 import CommandManager from './command/command-manager';
+import FirebaseManager from './io/firebase/firebase-manager';
 
 export default class Bot extends EventEmitter {
     constructor(){
@@ -13,10 +13,15 @@ export default class Bot extends EventEmitter {
         this.facebookMessenger = null;
 
         this.commandManager = new CommandManager(this);
+        this.firebaseManager = new FirebaseManager();
     }
 
     get CommandManager(){
         return this.commandManager;
+    }
+
+    get FirebaseManager(){
+        return this.firebaseManager;
     }
 
     async initialize(settings){
@@ -39,6 +44,10 @@ export default class Bot extends EventEmitter {
 
         if (settings.line.enabled){
             //TODO
+        }
+
+        if (settings['firebase-enabled']){
+            this.firebaseManager.initialize(settings['firebase']);
         }
 
         await Promise.all(tasks);
@@ -77,5 +86,3 @@ export default class Bot extends EventEmitter {
         await Promise.all(tasks);
     }
 }
-
-export { MessageTemplate, MessageAttachment }

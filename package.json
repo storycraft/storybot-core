@@ -1,6 +1,6 @@
 {
   "name": "storybot-core",
-  "version": "1.2.0",
+  "version": "1.2.5",
   "description": "story bot core part",
   "main": "./dist/index.js",
   "scripts": {
@@ -17,7 +17,8 @@
   "dependencies": {
     "@line/bot-sdk": "^5.2.0",
     "discord.js": "^11.3.0",
-    "facebook-chat-api": "github:Schmavery/facebook-chat-api"
+    "facebook-chat-api": "github:Schmavery/facebook-chat-api",
+    "firebase": "^4.10.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

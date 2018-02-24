@@ -27,5 +27,16 @@ export default {
         "password": "",
     },
 
-    "command-prefix": "*"
+    "command-prefix": "*",
+    
+    //데이터 저장을 위한 firebase 설정
+    "firebase-enabled": true,
+    "firebase": {
+        "apiKey": "",
+        "authDomain": "",
+        "databaseURL": "",
+        "projectId": "",
+        "storageBucket": "",
+        "messagingSenderId": ""
+    }
 }

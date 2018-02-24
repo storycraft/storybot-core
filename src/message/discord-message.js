@@ -1,6 +1,7 @@
 import UserMessage from "./user-message";
 import MessageTemplate from "./template/message-template";
 import Bot from "../bot";
+import DiscordUser from "../user/discord-user";
 
 export default class DiscordMessage extends UserMessage {
     constructor(rawMessage, user){
@@ -42,12 +43,14 @@ export default class DiscordMessage extends UserMessage {
         return this.RawMessage.edits;
     }
 
-    isMentioned(discordUser){
-        if (discordUser instanceof Bot){
-            return this.RawMessage.isMentioned(discordUser.DiscordClient.DiscordUser.DiscordUser);
+    isMentioned(user){
+        if (user instanceof Bot){
+            return this.RawMessage.isMentioned(user.DiscordClient.DiscordUser.DiscordUser);
         }
+        else if (user instanceof DiscordUser)
+            return this.RawMessage.isMentioned(user.DiscordUser);
 
-        return this.RawMessage.isMentioned(discordUser.DiscordUser);
+        return false;
     }
 
     async edit(msgTemplate){
