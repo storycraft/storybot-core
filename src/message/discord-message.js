@@ -19,7 +19,7 @@ export default class DiscordMessage extends UserMessage {
         return this.user;
     }
 
-    get Message(){
+    get Text(){
         return this.RawMessage.content;
     }
 

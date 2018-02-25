@@ -26,10 +26,10 @@ export default class CommandManager extends EventEmitter {
     }
 
     onCommand(msg){
-        if (!msg.Message.startsWith(this.CommandPrefix))
+        if (!msg.Text.startsWith(this.CommandPrefix))
             return;
 
-        var tokens = msg.Message.split(' ');
+        var tokens = msg.Text.split(' ');
 
         var command = tokens[0].substring(1);
         var args = tokens.slice(1);

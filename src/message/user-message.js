@@ -19,7 +19,7 @@ export default class UserMessage {
         return this.source;
     }
 
-    get Message(){
+    get Text(){
         return "";
     }
 
