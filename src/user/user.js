@@ -11,6 +11,11 @@ export default class User extends EventEmitter {
         return 0;
     }
 
+    //클라이언트간 구분 가능한 Id
+    get IdentityId(){
+        return '0';
+    }
+
     get Name(){
         return "";
     }

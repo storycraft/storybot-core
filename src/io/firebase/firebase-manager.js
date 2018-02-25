@@ -15,10 +15,10 @@ export default class FirebaseManager {
     }
 
     get Database(){
-        return this.Firebase.database(this.Firebase);
+        return firebase.database(this.Firebase);
     }
     
     get Storage(){
-        return this.Firebase.storage(this.Firebase);
+        return firebase.storage(this.Firebase);
     }
 }
