@@ -1,3 +1,4 @@
+﻿[![CodeFactor](https://www.codefactor.io/repository/github/storycraft/storybot-core/badge)](https://www.codefactor.io/repository/github/storycraft/storybot-core)
 # StoryBot
 
 **THIS PROJECT IS STILL DEVELOPING, API CAN CHANGE** 
