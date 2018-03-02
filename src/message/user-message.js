@@ -31,7 +31,7 @@ export default class UserMessage {
         return false;
     }
 
-    get Deleteable(){
+    get Deletable(){
         return false;
     }
 

@@ -31,8 +31,8 @@ export default class DiscordMessage extends UserMessage {
         return this.RawMessage.editable;
     }
 
-    get Deleteable(){
-        return this.RawMessage.deleteable;
+    get Deletable(){
+        return this.RawMessage.deletable;
     }
 
     get EditedTimestamp(){
