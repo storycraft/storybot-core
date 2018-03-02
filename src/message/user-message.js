@@ -57,7 +57,7 @@ export default class UserMessage {
     }
 
     async delete(){
-        if (!this.Deleteable)
+        if (!this.Deletable)
             throw new Error('이 메세지는 삭제 할 수 없습니다.');
     }
 }
