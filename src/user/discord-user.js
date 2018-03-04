@@ -9,6 +9,10 @@ export default class DiscordUser extends User {
         this.dmChan = null;
     }
 
+    get Id(){
+        return this.discordUser.id;
+    }
+
     get DiscordUser(){
         return this.discordUser;
     }

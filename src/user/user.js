@@ -13,7 +13,7 @@ export default class User extends EventEmitter {
 
     //클라이언트간 구분 가능한 Id
     get IdentityId(){
-        return '0';
+        return this.Id;
     }
 
     get Name(){
