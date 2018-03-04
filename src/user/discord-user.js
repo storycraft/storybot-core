@@ -14,7 +14,7 @@ export default class DiscordUser extends User {
     }
 
     get DiscordUser(){
-        return this.DiscordUser;
+        return this.discordUser;
     }
 
     get Tag(){
