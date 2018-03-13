@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+import User from '../user/user';
 
 /*
  * 어떤 클라이언트의 이벤트 목록
@@ -57,5 +58,12 @@ export class ChatHandler {
 
     get Client(){
         return this.client;
+    }
+}
+
+export class ClientUser extends User {
+    constructor(user){
+        super();
+        this.user = user;
     }
 }

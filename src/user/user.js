@@ -20,7 +20,7 @@ export default class User extends EventEmitter {
         return '';
     }
 
-    get hasDMChannel(){
+    get HasDMChannel(){
         return false;
     }
 

@@ -3,6 +3,7 @@ import { EventEmitter } from 'events';
 
 import CommandManager from './command/command-manager';
 import FirebaseManager from './io/firebase/firebase-manager';
+import User from './user/user';
 
 export default class Bot extends EventEmitter {
     constructor(){
@@ -11,6 +12,8 @@ export default class Bot extends EventEmitter {
         this.discord = null;
         this.line = null;
         this.facebookMessenger = null;
+
+        this.clients = [];
 
         this.commandManager = new CommandManager(this);
         this.firebaseManager = new FirebaseManager();
@@ -32,8 +35,7 @@ export default class Bot extends EventEmitter {
 
         if (settings.discord.enabled){
             this.discord = new DiscordClient();
-
-            this.discord.on('message', this.onMessage.bind(this));
+            this.addClient(this.discord);
 
             tasks.push(this.discord.initialize(settings.discord.userToken));
         }
@@ -55,6 +57,11 @@ export default class Bot extends EventEmitter {
         this.emit('ready');
     }
 
+    addClient(client){
+        this.clients.push(client);
+        client.on('message', this.onMessage.bind(this));
+    }
+
     get DiscordClient(){
         return this.discord;
     }
@@ -65,10 +72,6 @@ export default class Bot extends EventEmitter {
     
     get FacebookMessenger(){
         return this.facebookMessenger;
-    }
-
-    addClient(client){
-
     }
 
     onMessage(msg){

@@ -29,7 +29,7 @@ export default class DiscordUser extends User {
         return this.DiscordUser.username;
     }
 
-    get hasDMChannel(){
+    get HasDMChannel(){
         return !!(this.dmChan);
     }
 

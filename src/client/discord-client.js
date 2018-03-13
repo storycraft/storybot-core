@@ -1,10 +1,9 @@
-import Client, { ChatHandler } from './client';
+import Client, { ChatHandler, ClientUser } from './client';
 
 import Discord from 'discord.js';
 import DiscordUser from '../user/discord-user';
 import DiscordMessage from '../message/discord-message';
 import DiscordChannel, { DiscordDMChannel } from '../channel/discord-channel';
-import discordUser from '../user/discord-user';
 
 export default class DiscordClient extends Client {
     constructor(){
@@ -33,7 +32,8 @@ export default class DiscordClient extends Client {
         //제공된 토큰을 사용하여 비동기 로그인
         var obj = await this.DiscordClient.login(token);
 
-        this.user = this.getWrappedUser(this.DiscordClient.user);
+        this.user = new DiscordClientUser(this.DiscordClient.user);
+        this.hookUserWithId(this.user.Id, this.user);
 
         this.initializing = false;
         this.ready = true;
@@ -111,9 +111,13 @@ export default class DiscordClient extends Client {
 
         let wrappedUser = DiscordUser.fromDiscordUser(user);
 
-        this.users.set(user.id, wrappedUser);
+        this.hookUserWithId(user.id, wrappedUser);
 
         return wrappedUser;
+    }
+
+    hookUserWithId(id, wrappedUser){
+        this.users.set(id, wrappedUser);
     }
 
     //해당 네임으로 DM 그룹쳇 생성
@@ -137,13 +141,15 @@ class DiscordChatHandler extends ChatHandler {
     constructor(client){
         super(client);
 
-        this.Client.on('ready', this.onReady.bind(this));
-        this.Client.on('message', this.onMessage.bind(this));
+        let discord = this.Client.DiscordClient;
+        discord.on('ready', this.onReady.bind(this));
+        discord.on('message', this.onMessage.bind(this));
     }
 
     onMessage(msg){
         var sourceChannel = this.Client.getSource(msg);
         var user = this.Client.getWrappedUser(msg.author);
+
         var message = DiscordMessage.fromRawDiscordMessage(sourceChannel, user, msg);
 
         sourceChannel.emit('message', message);
@@ -158,5 +164,40 @@ class DiscordChatHandler extends ChatHandler {
 
     destroy(){
 
+    }
+}
+
+class DiscordClientUser extends ClientUser {
+    constructor(user){
+        super(user);
+        this.discordUser = new DiscordUser(user);
+    }
+
+    get DiscordUser(){
+        return this.discordUser;
+    }
+
+    get Id(){
+        return this.DiscordUser.id;
+    }
+
+    get Tag(){
+        return this.DiscordUser.Tag;
+    }
+
+    get IdentityId(){
+        return this.DiscordUser.IdentityId;
+    }
+
+    get Name(){
+        return this.DiscordUser.Name;
+    }
+
+    get HasDMChannel(){
+        return this.DiscordUser.HasDMChannel;
+    }
+
+    async getDMChannel(){
+        return this.DiscordUser.getDMChannel();
     }
 }
