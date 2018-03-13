@@ -42,7 +42,7 @@ export default class Bot extends EventEmitter {
             //TODO
         }
 
-        if (settings.line.enabled){
+        if (settings.facebook.enabled){
             //TODO
         }
 
@@ -65,6 +65,10 @@ export default class Bot extends EventEmitter {
     
     get FacebookMessenger(){
         return this.facebookMessenger;
+    }
+
+    addClient(client){
+
     }
 
     onMessage(msg){

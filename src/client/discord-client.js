@@ -1,4 +1,4 @@
-import Client from './client';
+import Client, { ChatHandler } from './client';
 
 import Discord from 'discord.js';
 import DiscordUser from '../user/discord-user';
@@ -23,16 +23,13 @@ export default class DiscordClient extends Client {
      */
     
     async initialize(token){
-        if (this.Ready)
+        if (this.Ready || this.Initializing)
             throw new Error('해당 클라이언트는 이미 활성화 되어있거나 초기화 중입니다');
         this.initializing = true;
         
         this.discord = new Discord.Client();
+        this.handler = new DiscordChatHandler(this);
         
-        //리스너 연결
-        this.DiscordClient.on('ready', this.onReady.bind(this));
-        this.DiscordClient.on('message', this.onMessage.bind(this));
-
         //제공된 토큰을 사용하여 비동기 로그인
         var obj = await this.DiscordClient.login(token);
 
@@ -48,60 +45,49 @@ export default class DiscordClient extends Client {
         return this.discord;
     }
 
-    get DiscordUser(){
+    get ClientUser(){
         return this.user;
+    }
+
+    get Handler(){
+        return this.handler;
     }
 
     //Discord User 관련 부분 시작
 
     get UserName(){
-        return this.DiscordUser.DiscordUser.username;
+        return this.DiscordUser.ClientUser.username;
     }
 
     async setUserName(name){
-        await this.DiscordUser.DiscordUser.setUsername(name);
+        await this.ClientUser.DiscordUser.setUsername(name);
     }
 
     get Avatar(){
-        return this.DiscordUser.DiscordUser.avatarURL;
+        return this.ClientUser.DiscordUser.avatarURL;
     }
 
     async setAvatar(buffer){
-        await this.DiscordUser.DiscordUser.setAvatar(buffer);
+        await this.ClientUser.DiscordUser.setAvatar(buffer);
     }
 
     get Status(){
-        return this.DiscordUser.DiscordUser.avatarURL;
+        return this.ClientUser.DiscordUser.avatarURL;
     }
 
     async setStatus(statusString){
-        await this.DiscordUser.DiscordUser.setStatus(statusString);
+        await this.ClientUser.DiscordUser.setStatus(statusString);
     }
 
     get Presence(){
-        return this.DiscordUser.DiscordUser.presence;
+        return this.ClientUser.DiscordUser.presence;
     }
 
     async setPresence(rawPresenceData){
-        await this.DiscordUser.DiscordUser.setPresence(rawPresenceData);
+        await this.ClientUser.DiscordUser.setPresence(rawPresenceData);
     }
 
     //Discord User 관련 부분 끝
-
-    onReady(){
-        this.emit('ready');
-    }
-
-    onMessage(msg){
-        var sourceChannel = this.getSource(msg);
-        var user = this.getWrappedUser(msg.author);
-        var message = DiscordMessage.fromRawDiscordMessage(sourceChannel, user, msg);
-
-        sourceChannel.emit('message', message);
-        user.emit('message', message);
-
-        this.emit('message', message);
-    }
 
     getSource(msg){
         if (this.channels.has(msg.channel.id))
@@ -132,7 +118,7 @@ export default class DiscordClient extends Client {
 
     //해당 네임으로 DM 그룹쳇 생성
     async createChannel(name){
-        var chan = await this.DiscordUser.DiscordUser.createGroupDM(name);
+        var chan = await this.ClientUser.DiscordUser.createGroupDM(name);
 
         return new DiscordDMChannel(chan);
     }
@@ -141,6 +127,36 @@ export default class DiscordClient extends Client {
         if (!this.Ready)
             return;
 
+        this.Handler.destroy();
+
         await this.DiscordClient.destroy();
+    }
+}
+
+class DiscordChatHandler extends ChatHandler {
+    constructor(client){
+        super(client);
+
+        this.Client.on('ready', this.onReady.bind(this));
+        this.Client.on('message', this.onMessage.bind(this));
+    }
+
+    onMessage(msg){
+        var sourceChannel = this.Client.getSource(msg);
+        var user = this.Client.getWrappedUser(msg.author);
+        var message = DiscordMessage.fromRawDiscordMessage(sourceChannel, user, msg);
+
+        sourceChannel.emit('message', message);
+        user.emit('message', message);
+
+        this.Client.emit('message', message);
+    }
+
+    onReady(){
+        this.Client.emit('ready');
+    }
+
+    destroy(){
+
     }
 }

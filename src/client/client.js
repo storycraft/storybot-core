@@ -1,4 +1,4 @@
-import EventEmitter from 'events';
+import { EventEmitter } from 'events';
 
 /*
  * 어떤 클라이언트의 이벤트 목록
@@ -13,7 +13,7 @@ export default class Client extends EventEmitter {
 
         this.ready = false;
         this.initializing = false;
-        this.source = null;
+        this.user = null;
     }
 
     get Ready(){
@@ -24,7 +24,11 @@ export default class Client extends EventEmitter {
         return this.initializing;
     }
 
-    get Source(){
+    get ClientUser(){
+        return this.user;
+    }
+
+    get Handler(){
         return null;
     }
 
@@ -43,5 +47,15 @@ export default class Client extends EventEmitter {
 
     async destroy(){
         
+    }
+}
+
+export class ChatHandler {
+    constructor(client){
+        this.client = client;
+    }
+
+    get Client(){
+        return this.client;
     }
 }

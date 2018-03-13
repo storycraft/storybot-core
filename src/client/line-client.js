@@ -27,7 +27,7 @@ export default class LineClient extends Client {
      */
 
     async initialize(config){
-        if (this.Ready)
+        if (this.Ready || this.Initializing)
             throw new Error('해당 클라이언트는 이미 활성화 되어있거나 초기화 중입니다');
         this.initializing = true;
         

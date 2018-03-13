@@ -1,4 +1,4 @@
-import EventEmitter from 'events';
+import { EventEmitter } from 'events';
 
 export default class Channel extends EventEmitter {
     constructor(client, id, name){
