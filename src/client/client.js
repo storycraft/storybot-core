@@ -62,8 +62,7 @@ export class ChatHandler {
 }
 
 export class ClientUser extends User {
-    constructor(user){
+    constructor(){
         super();
-        this.user = user;
     }
 }

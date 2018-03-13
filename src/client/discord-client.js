@@ -56,7 +56,7 @@ export default class DiscordClient extends Client {
     //Discord User 관련 부분 시작
 
     get UserName(){
-        return this.DiscordUser.ClientUser.username;
+        return this.ClientUser.DiscordUser.username;
     }
 
     async setUserName(name){
@@ -111,7 +111,7 @@ export default class DiscordClient extends Client {
 
         let wrappedUser = DiscordUser.fromDiscordUser(user);
 
-        this.hookUserWithId(user.id, wrappedUser);
+        this.hookUserWithId(wrappedUser.Id, wrappedUser);
 
         return wrappedUser;
     }
@@ -169,8 +169,8 @@ class DiscordChatHandler extends ChatHandler {
 
 class DiscordClientUser extends ClientUser {
     constructor(user){
-        super(user);
-        this.discordUser = new DiscordUser(user);
+        super();
+        this.discordUser = DiscordUser.fromDiscordUser(user);
     }
 
     get DiscordUser(){
@@ -178,7 +178,7 @@ class DiscordClientUser extends ClientUser {
     }
 
     get Id(){
-        return this.DiscordUser.id;
+        return this.DiscordUser.Id;
     }
 
     get Tag(){

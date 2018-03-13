@@ -39,11 +39,11 @@ export default class DiscordChannel extends Channel {
             let sendQueue = this.TextChannel.send(msgTemplate.Text || '');
 
             this.TextChannel.stopTyping();
-            messages.push(DiscordMessage.fromRawDiscordMessage(this, this.Client.getWrappedUser(this.Client.DiscordUser), await sendQueue));
+            messages.push(DiscordMessage.fromRawDiscordMessage(this, this.Client.getWrappedUser(this.Client.ClientUser), await sendQueue));
         }
 
         for(let attachment of msgTemplate.Attachments){
-            messages.push(DiscordMessage.fromRawDiscordMessage(this, this.Client.getWrappedUser(this.Client.DiscordUser), await this.TextChannel.send('', new Attachment(attachment.Buffer, attachment.Name))));
+            messages.push(DiscordMessage.fromRawDiscordMessage(this, this.Client.getWrappedUser(this.Client.ClientUser), await this.TextChannel.send('', new Attachment(attachment.Buffer, attachment.Name))));
         }
 
         return messages;
