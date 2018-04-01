@@ -170,6 +170,6 @@ class DiscordChatHandler extends ChatHandler {
 class DiscordClientUser extends ClientUser {
     constructor(user){
         super();
-        this.discordUser = user;
+        super.discordUser = user;
     }
 }
