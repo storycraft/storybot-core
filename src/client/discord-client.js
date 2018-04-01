@@ -34,6 +34,7 @@ export default class DiscordClient extends Client {
 
         this.user = new DiscordClientUser(this.DiscordClient.user);
         this.hookUserWithId(this.user.Id, this.user);
+        console.log(this.user.DiscordUser);
 
         this.initializing = false;
         this.ready = true;
@@ -170,6 +171,35 @@ class DiscordChatHandler extends ChatHandler {
 class DiscordClientUser extends ClientUser {
     constructor(user){
         super();
-        super.discordUser = user;
+        this.discordUser = user;
+    }
+
+    get DiscordUser(){
+        return this.discordUser;
+    }
+
+    get Id(){
+        return this.DiscordUser.id;
+    }
+
+    get Tag(){
+        return this.DiscordUser.tag;
+    }
+
+    get IdentityId(){
+        return `discord:${this.Id}`;
+    }
+
+    get Name(){
+        return this.DiscordUser.username;
+    }
+
+    get HasDMChannel(){
+        return !!(this.dmChan);
+    }
+
+    async getDMChannel(){
+        //DM Channel이 없을 경우 만든 후 캐싱
+        return this.dmChan || (this.dmChan = await this.DiscordUser.createDM());
     }
 }
