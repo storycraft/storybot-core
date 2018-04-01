@@ -170,34 +170,6 @@ class DiscordChatHandler extends ChatHandler {
 class DiscordClientUser extends ClientUser {
     constructor(user){
         super();
-        this.discordUser = DiscordUser.fromDiscordUser(user);
-    }
-
-    get DiscordUser(){
-        return this.discordUser;
-    }
-
-    get Id(){
-        return this.DiscordUser.Id;
-    }
-
-    get Tag(){
-        return this.DiscordUser.Tag;
-    }
-
-    get IdentityId(){
-        return this.DiscordUser.IdentityId;
-    }
-
-    get Name(){
-        return this.DiscordUser.Name;
-    }
-
-    get HasDMChannel(){
-        return this.DiscordUser.HasDMChannel;
-    }
-
-    async getDMChannel(){
-        return this.DiscordUser.getDMChannel();
+        this.discordUser = user;
     }
 }
