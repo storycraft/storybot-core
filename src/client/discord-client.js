@@ -34,7 +34,6 @@ export default class DiscordClient extends Client {
 
         this.user = new DiscordClientUser(this.DiscordClient.user);
         this.hookUserWithId(this.user.Id, this.user);
-        console.log(this.user.DiscordUser);
 
         this.initializing = false;
         this.ready = true;
