@@ -45,7 +45,7 @@ export default class DiscordMessage extends UserMessage {
 
     isMentioned(user){
         if (user instanceof Bot){
-            return this.RawMessage.isMentioned(user.DiscordClient.DiscordUser.DiscordUser);
+            return this.RawMessage.isMentioned(user.ClientUser.DiscordUser.DiscordUser);
         }
         else if (user instanceof DiscordUser)
             return this.RawMessage.isMentioned(user.DiscordUser);
