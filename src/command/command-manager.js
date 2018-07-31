@@ -31,7 +31,7 @@ export default class CommandManager extends EventEmitter {
 
         var tokens = msg.Text.split(' ');
 
-        var command = tokens[0].substring(1);
+        var command = tokens[0].substring(this.CommandPrefix.length);
         var args = tokens.slice(1);
 
         if (command == '')
