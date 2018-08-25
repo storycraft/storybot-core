@@ -2,10 +2,10 @@ import User from './user';
 import UserMessage from '../message/user-message';
 
 export default class DiscordUser extends User {
-    constructor(){
+    constructor(discordUser){
         super();
 
-        this.discordUser = null;
+        this.discordUser = discordUser;
         this.dmChan = null;
     }
 
@@ -44,13 +44,5 @@ export default class DiscordUser extends User {
         var rawMessage = await dmChan.send(str, option);
 
         return new UserMessage(this, rawMessage.content, new Date(rawMessage.createdTimestamp), rawMessage.editable, rawMessage.deleteable);
-    }
-
-    static fromDiscordUser(discordUser){
-        let user = new DiscordUser();
-
-        user.discordUser = discordUser;
-
-        return user;
     }
 }

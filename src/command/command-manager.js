@@ -29,10 +29,13 @@ export default class CommandManager extends EventEmitter {
         if (!msg.Text.startsWith(this.CommandPrefix))
             return;
 
-        var tokens = msg.Text.split(' ');
+        var commandIndex = msg.Text.indexOf(' ');
 
-        var command = tokens[0].substring(this.CommandPrefix.length);
-        var args = tokens.slice(1);
+        if (commandIndex == -1)
+            commandIndex = msg.Text.length;
+    
+        var command = msg.Text.substring(this.CommandPrefix.length, commandIndex);
+        var args = msg.Text.substr(0, this.CommandPrefix.length + commandIndex).split(' ');
 
         if (command == '')
             return;

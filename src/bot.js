@@ -4,6 +4,7 @@ import { EventEmitter } from 'events';
 import CommandManager from './command/command-manager';
 import FirebaseManager from './io/firebase/firebase-manager';
 import User from './user/user';
+import WebClient from './client/web-client';
 
 export default class Bot extends EventEmitter {
     constructor(){
@@ -12,6 +13,7 @@ export default class Bot extends EventEmitter {
         this.discord = null;
         this.line = null;
         this.facebookMessenger = null;
+        this.web = null;
 
         this.clients = [];
 
@@ -48,6 +50,13 @@ export default class Bot extends EventEmitter {
             //TODO
         }
 
+        if (settings.web.enabled) {
+            this.web = new WebClient();
+            this.addClient(this.web);
+
+            tasks.push(this.web.initialize(settings.web.port));
+        }
+
         if (settings['firebase-enabled']){
             this.firebaseManager.initialize(settings['firebase']);
         }
@@ -68,6 +77,10 @@ export default class Bot extends EventEmitter {
 
     get LineClient(){
         return this.line;
+    }
+
+    get WebClient(){
+        return this.web;
     }
     
     get FacebookMessenger(){

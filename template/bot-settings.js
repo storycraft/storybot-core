@@ -27,6 +27,12 @@ export default {
         "password": "",
     },
 
+    //Web 설정
+    "web": {
+        "enabled": true,
+        "port": 7000,
+    },
+
     "command-prefix": "*",
     
     //데이터 저장을 위한 firebase 설정
