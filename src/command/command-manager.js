@@ -35,7 +35,7 @@ export default class CommandManager extends EventEmitter {
             commandIndex = msg.Text.length;
     
         var command = msg.Text.substring(this.CommandPrefix.length, commandIndex);
-        var args = msg.Text.substr(0, this.CommandPrefix.length + commandIndex).split(' ');
+        var args = msg.Text.substring(this.CommandPrefix.length + commandIndex).split(' ');
 
         if (command == '')
             return;
