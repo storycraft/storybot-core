@@ -1,5 +1,9 @@
-import Client from "./client";
-import http from 'http';
+import Client, { ClientUser } from "./client";
+import SocketServer from "socket.io";
+import WebChannel from "../channel/web-channel";
+import { EventEmitter } from "events";
+import WebMessage from "../message/web-message";
+import WebUser from "../user/web-user";
 
 export default class WebClient extends Client {
     constructor() {
@@ -10,7 +14,8 @@ export default class WebClient extends Client {
         this.server = null;
         this.handler = new WebHandler(this);
 
-        this.channelMap = new Map();
+        this.socketMap = new Map();
+        this.user = new WebClientUser(this);
     }
 
     get Port(){
@@ -25,14 +30,48 @@ export default class WebClient extends Client {
         return this.server;
     }
 
+    addSocketHandler(socket) {
+        if (this.hasSocketHandler(socket))
+            return this.getSocketHandler(socket);
+
+        var handler = new SocketHandler(this, socket);
+        this.socketMap.set(socket.id, handler);
+        
+        return handler;
+    }
+
+    hasSocketHandler(socket) {
+        return this.socketMap.has(socket.id);
+    }
+
+    getSocketHandler(socket) {
+        if (!this.hasSocketHandler(socket))
+            return null;
+
+        return this.socketMap.get(socket.id);
+    }
+
+    removeSocketHandler(socket) {
+        if (!this.hasSocketHandler(socket))
+            return false;
+
+        this.socketMap.delete(socket.id);
+
+        return true;
+    }
+
     async initialize(port){
         if (this.Ready || this.Initializing)
             throw new Error('해당 클라이언트는 이미 활성화 되어있거나 초기화 중입니다');
         this.initializing = true;
         
         this.port = port || 7000;
-        this.server = http.createServer(this.Handler.handleConnection.bind(this.Handler));
+        this.server = new SocketServer({
+            serveClient: false
+        });
         this.server.listen(this.port);
+
+        await this.handler.initialize();
 
         this.initializing = false;
         this.ready = true;
@@ -42,15 +81,128 @@ export default class WebClient extends Client {
         
     }
 
-
     async sendMessage(msgTemplate){
+        var taskList = [];
 
+        for (let [id, socket] of this.socketMap.entries()) {
+            taskList.push(socket.sendMessage(msgTemplate));
+        }
+
+        await Promise.all(taskList);
     }
 
     async destroy(){
         
     }
 }
+
+export class WebClientUser extends ClientUser {
+    get Id(){
+        return -1;
+    }
+
+    //클라이언트간 구분 가능한 Id
+    get IdentityId(){
+        return "web:" + this.Id;
+    }
+
+    get Name(){
+        return 'Storybot';
+    }
+
+    get HasDMChannel(){
+        return false;
+    }
+}
+
+export class WebHandler {
+    constructor(webClient) {
+        this.webClient = webClient;
+    }
+
+    get WebClient(){
+        return this.webClient;
+    }
+
+    get SocketServer(){
+        return this.WebClient.Server;
+    }
+
+    async initialize() {
+        this.SocketServer.sockets.on('connection', this.onConnected.bind(this));
+    }
+
+    onConnected(socket) {
+        console.log(socket.id + " is connected to storybot");
+
+        var handler = this.WebClient.addSocketHandler(socket);
+
+        /*
+        {
+            "namespace": "asdf",
+            "service": "kakao bot"
+            "id": 8176289391423 <- this is unique id
+        }
+        */
+        socket.on('initialize', (jsonData) => {
+            try {
+                if (!handler.Initialized) {
+                    handler.initialize(jsonData.namespace, jsonData.serviceDesc);
+
+                    console.log(`socket ${socket.id} is initialized to namespace: ${handler.Namespace}, service: ${handler.ServiceDesc}`);
+                }
+                else {
+                    throw new Error("Handler already initialized?!");
+                }
+            } catch (e) {
+                console.log(`Error while initializing from ${socket.id}: ${e}`);
+            }
+        });
+    }
+}
+
+export class SocketHandler extends EventEmitter {
+    constructor(webClient, socket, namespace) {
+        this.webClient = webClient;
+        this.socket = socket;
+
+        this.namespace = null;
+        this.serviceDesc = null;
+        this.initialized = false;
+
+        this.channelMap = new Map();
+        this.userMap = new Map();
+
+        this.socket.on('message', this.onMessage.bind(this));
+        this.socket.on('disconnect', this.onDisconnect.bind(this));
+    }
+
+    get Socket(){
+        return this.socket;
+    }
+
+    get Initialized() {
+        return this.initialized;
+    }
+
+    get Namespace() {
+        return this.namespace;
+    }
+
+    get ServiceDesc() {
+        return this.serviceDesc;
+    }
+
+    get WebClient() {
+        return this.webClient;
+    }
+
+    initialize(namespace, serviceDesc) {
+        this.namespace = namespace;
+        this.serviceDesc = serviceDesc;
+
+        this.initialized = true;
+    }
 
 /*
 {
@@ -63,40 +215,124 @@ export default class WebClient extends Client {
         "nickname": "asdf" 
     },
     "message": {
-        "attachments": [],
+        "timestamp": 12897682391,
+        "attachments": [
+            {"type": "image", "url": "asdf"}
+        ],
         "text": "asdf"
     }
 }
 */
-export class WebHandler {
-    constructor(webClient) {
-        this.webClient = webClient;
-    }
-
-    get WebClient(){
-        return this.webClient;
-    }
-
-    async handleConnection(req, res) {
-        let data = await new Promise((resolve, reject) => {
-            let data = '';
-            res.on('data', (chunk) => {
-                data += chunk;
-            });
-    
-            res.on('end', () => {
-                resolve(data);
-            });
-        });
-
-        var json = {};
-        try {
-            json = JSON.parse(data);
-        } catch(e) {
-            res.setHeader('Content-Type', 'application/json');
+    onMessage(jsonData) {
+        if (!this.Initialized) {
+            return;
         }
 
+        try {
+            var rawChannel = jsonData.channel;
+            var rawUser = jsonData.user;
+            var rawMessage = jsonData.message;
 
-        res.setHeader('Content-Type', 'application/json');
+            var user = this.getWrappedUser(rawUser.id);
+
+            var channel = null;
+            if (this.hasChannel(rawChannel.id)) {
+                channel = this.getChannel(rawChannel.id);
+            }
+            else {
+                channel = this.addChannel(rawChannel.id);
+            }
+
+            if (rawMessage.Text) {
+                var message = new WebMessage(rawMessage.Text, rawMessage.timestamp, channel, user);
+
+                this.emit('message', message);
+                this.WebClient.emit('message', message);
+                this.channel.emit('message', message);
+                this.user.emit('message', message);
+            }
+
+            for (var attachment of rawMessage.attachments) {
+                var message = new WebMessage('', rawMessage.timestamp, channel, user);
+
+                this.emit('message', message);
+                this.WebClient.emit('message', message);
+                this.channel.emit('message', message);
+                this.user.emit('message', message);
+            }
+
+        } catch (e) {
+            console.log(`Error on parsing message from socket ${this.Socket.id}. ${e}`);
+        }
+    }
+
+    /*
+    {
+        "channel": 81728497923,
+        "attachments": [],
+        "text": "asdf"
+    }
+    */
+    async sendMessage(msgTemplate, channel) {
+        if (channel) {
+            return channel.sendMessage(msgTemplate);
+        }
+        else {
+            var messageList = [];
+
+            for (let [id, channel] of this.channelMap) {
+                var messages = await channel.sendMessage(msgTemplate);
+
+                for (let message of messages) {
+                    messageList.push(message);
+                }
+            }
+
+            return messageList;
+        }
+    }
+
+    addChannel(channelId) {
+        if (!this.hasChannel(channelId))
+            return this.getChannel(channelId);
+            
+        var webChannel = new WebChannel(this.WebClient, this, channelId, "Unknown");
+
+        this.channelMap.set(channelId, webChannel);
+
+        return webChannel;
+    }
+
+    getChannel(channelId) {
+        if (!this.hasChannel(channelId))
+            return null;
+
+        return this.channelMap.get(channelId);
+    }
+
+    hasChannel(channelId) {
+        return this.channelMap.has(id);
+    }
+
+    getWrappedUser(userId, name) {
+        if (userId == this.WebClient.ClientUser.Id)
+            return this.WebClient.ClientUser;
+
+        if (this.userMap.has(userId)) {
+            var user = this.userMap.get(userId);
+            if (name)
+                user.updateName(name);
+            return user;
+        }
+
+        var user = new WebUser(userId, this.Namespace, name);
+        this.userMap.set(userId, user);
+        return user;
+    }
+
+    onDisconnect() {
+        console.log(socket.id + " is disconnected from storybot");
+
+        this.WebClient.removeSocketHandler(this);
     }
 }

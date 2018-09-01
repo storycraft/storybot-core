@@ -1,10 +1,12 @@
 import User from './user';
 import UserMessage from '../message/user-message';
+import { DMChannel } from 'discord.js';
 
 export default class DiscordUser extends User {
-    constructor(discordUser){
+    constructor(client, discordUser){
         super();
 
+        this.client = client;
         this.discordUser = discordUser;
         this.dmChan = null;
     }
@@ -35,14 +37,12 @@ export default class DiscordUser extends User {
 
     async getDMChannel(){
         //DM Channel이 없을 경우 만든 후 캐싱
-        return this.dmChan || (this.dmChan = await this.DiscordUser.createDM());
+        return this.dmChan || (this.dmChan = new DiscordDMChannel(this.client, await this.DiscordUser.createDM()));
     }
 
-    async sendMessage(str, option){
+    async send(msgTemplate){
         var dmChan = await this.getDMChannel();
 
-        var rawMessage = await dmChan.send(str, option);
-
-        return new UserMessage(this, rawMessage.content, new Date(rawMessage.createdTimestamp), rawMessage.editable, rawMessage.deleteable);
+        return dmChan.send(msgTemplate);
     }
 }

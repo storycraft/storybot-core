@@ -109,7 +109,7 @@ export default class DiscordClient extends Client {
         if (this.users.has(user.id))
             return this.users.get(user.id);
 
-        let wrappedUser = new DiscordUser(user);
+        let wrappedUser = new DiscordUser(this, user);
 
         this.hookUserWithId(wrappedUser.Id, wrappedUser);
 

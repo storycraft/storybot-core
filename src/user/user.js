@@ -29,7 +29,7 @@ export default class User extends EventEmitter {
     }
 
     //유저에게 DM(1대 1 채팅) 전송
-    async sendMessage(str, option){
+    async send(msgTemplate){
         throw new Error("이 유저는 DM 전송을 지원하지 않습니다");
     }
 

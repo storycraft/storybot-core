@@ -1,9 +1,10 @@
 import User from './user';
 export default class WebUser extends User {
-    constructor(id, name){
+    constructor(id, namespace, name){
         super();
 
         this.id = id;
+        this.namespace = namespace;
         this.name = name;
     }
 
@@ -12,7 +13,7 @@ export default class WebUser extends User {
     }
 
     get IdentityId(){
-        return `web:${this.Id}`;
+        return `web_${this.namespace}:${this.Id}`;
     }
 
     get Name(){
@@ -27,7 +28,11 @@ export default class WebUser extends User {
         return null;
     }
 
-    async sendMessage(str, option){
+    async send(msgTemplate){
         throw new Error("Cannot DM to Web User");
+    }
+
+    updateName(name) {
+        this.name = name;
     }
 }
