@@ -35,7 +35,7 @@ export default class WebChannel extends Channel {
                 'text': msgTemplate.Text
             });
 
-            var message = new WebMessage(msgTemplate.Text, new Date(), this.Handler.WebClient.ClientUser, this.Handler.WebClient.ClientUser);
+            var message = new WebMessage(msgTemplate.Text, new Date(), this, this.Handler.WebClient.ClientUser);
             this.Client.emit('message', message);
             message.User.emit('message', message);
             this.Handler.emit('message', message);
@@ -52,7 +52,7 @@ export default class WebChannel extends Channel {
                 'type': 'attachment'
             }, attachment.Buffer);
 
-            var message = new WebMessage('', new Date(), this.Handler.WebClient.ClientUser, this.Handler.WebClient.ClientUser);
+            var message = new WebMessage('', new Date(), this, this.Handler.WebClient.ClientUser);
             this.Client.emit('message', message);
             message.User.emit('message', message);
             this.Handler.emit('message', message);
