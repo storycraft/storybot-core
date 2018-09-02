@@ -247,14 +247,14 @@ export class SocketHandler extends EventEmitter {
             var rawUser = jsonData.user;
             var rawMessage = jsonData.message;
 
-            var user = this.getWrappedUser(rawUser.id);
+            var user = this.getWrappedUser(rawUser.id, rawUser.nickname);
 
             var channel = null;
             if (this.hasChannel(rawChannel.id)) {
-                channel = this.getChannel(rawChannel.id);
+                channel = this.getChannel(rawChannel.id, rawChannel.name);
             }
             else {
-                channel = this.addChannel(rawChannel.id);
+                channel = this.addChannel(rawChannel.id, rawChannel.name);
             }
 
             if (rawMessage.text) {
@@ -283,6 +283,10 @@ export class SocketHandler extends EventEmitter {
     /*
     {
         "channel": 81728497923,
+        "user": {
+            "id": 178293671283,
+            "nickname": "asdf" 
+        },
         "attachments": [],
         "text": "asdf"
     }
@@ -306,22 +310,27 @@ export class SocketHandler extends EventEmitter {
         }
     }
 
-    addChannel(channelId) {
+    addChannel(channelId, name) {
         if (this.hasChannel(channelId))
             return this.getChannel(channelId);
             
-        var webChannel = new WebChannel(this.WebClient, this, channelId, "Unknown");
+        var webChannel = new WebChannel(this.WebClient, this, channelId, name ? name : 'Unknown Channel');
 
         this.channelMap.set(channelId, webChannel);
 
         return webChannel;
     }
 
-    getChannel(channelId) {
+    getChannel(channelId, updateName) {
         if (!this.hasChannel(channelId))
             return null;
 
-        return this.channelMap.get(channelId);
+        var channel = this.channelMap.get(channelId);
+
+        if (updateName) {
+            channel.updateName(updateName);
+        }
+        return channel;
     }
 
     hasChannel(channelId) {
@@ -339,7 +348,7 @@ export class SocketHandler extends EventEmitter {
             return user;
         }
 
-        var user = new WebUser(userId, this.Namespace, name);
+        var user = new WebUser(userId, this.Namespace, name ? name : 'Unknown User');
         this.userMap.set(userId, user);
         return user;
     }

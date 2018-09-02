@@ -27,6 +27,10 @@ export default class WebChannel extends Channel {
         if (msgTemplate.Text) {
             this.Handler.Socket.emit('message', {
                 'channel': this.Id,
+                'user': {
+                    'id': this.Handler.WebClient.ClientUser.Id,
+                    'name': this.Handler.WebClient.ClientUser.Name
+                },
                 'type': 'text',
                 'text': msgTemplate.Text
             });
@@ -41,6 +45,10 @@ export default class WebChannel extends Channel {
         for (let attachment of msgTemplate.Attachments) {
             this.Handler.Socket.emit('message', {
                 'channel': this.Id,
+                'user': {
+                    'id': this.Handler.WebClient.ClientUser.Id,
+                    'name': this.Handler.WebClient.ClientUser.Name
+                },
                 'type': 'attachment'
             }, attachment.Buffer);
 
@@ -52,5 +60,9 @@ export default class WebChannel extends Channel {
         }
 
         return messageList;
+    }
+
+    updateName(name) {
+        this.name = name;
     }
 }
