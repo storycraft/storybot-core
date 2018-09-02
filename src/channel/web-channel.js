@@ -1,5 +1,6 @@
 import Channel from "./channel";
 import WebMessage from "../message/web-message";
+import MessageTemplate from "../message/template/message-template";
 
 export default class WebChannel extends Channel {
     constructor(client, handler, id, name){
@@ -24,28 +25,28 @@ export default class WebChannel extends Channel {
         var messageList = [];
 
         if (msgTemplate.Text) {
-            this.Handler.Socket.send('message', {
+            this.Handler.Socket.emit('message', {
                 'channel': this.Id,
                 'type': 'text',
                 'text': msgTemplate.Text
             });
 
-            var message = new WebMessage(msgTemplate.Text, new Date(), this.Handler.WebClient.ClientUser);
+            var message = new WebMessage(msgTemplate.Text, new Date(), this.Handler.WebClient.ClientUser, this.Handler.WebClient.ClientUser);
             this.Client.emit('message', message);
-            this.Client.ClientUser.emit('message', message);
+            message.User.emit('message', message);
             this.Handler.emit('message', message);
             messageList.push(message);
         }
 
         for (let attachment of msgTemplate.Attachments) {
-            this.Handler.Socket.send('message', {
+            this.Handler.Socket.emit('message', {
                 'channel': this.Id,
                 'type': 'attachment'
             }, attachment.Buffer);
 
-            var message = new WebMessage('', new Date(), this.Handler.WebClient.ClientUser);
+            var message = new WebMessage('', new Date(), this.Handler.WebClient.ClientUser, this.Handler.WebClient.ClientUser);
             this.Client.emit('message', message);
-            this.Client.ClientUser.emit('message', message);
+            message.User.emit('message', message);
             this.Handler.emit('message', message);
             messageList.push(message);
         }

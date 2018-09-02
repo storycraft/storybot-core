@@ -38,6 +38,8 @@ export default class DiscordClient extends Client {
         this.initializing = false;
         this.ready = true;
 
+        console.log('Discord 클라이언트가 초기화 되었습니다');
+
         return obj;
     }
 

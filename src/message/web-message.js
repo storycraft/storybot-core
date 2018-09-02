@@ -1,19 +1,14 @@
 import UserMessage from "./user-message";
-import MessageTemplate from "./template/message-template";
-import Bot from "../bot";
-import WebUser from "../user/web-user";
 
 export default class WebMessage extends UserMessage {
     constructor(text, timestamp, source, user){
         super(user);
 
+        this.text = text;
         this.timestamp = timestamp;
-        this.source = source;
         this.user = user;
-    }
 
-    get RawMessage(){
-        return this.rawMessage;
+        this.source = source;
     }
 
     get User(){
@@ -21,11 +16,11 @@ export default class WebMessage extends UserMessage {
     }
 
     get Text(){
-        return this.RawMessage.content;
+        return this.text;
     }
 
     get Timestamp(){
-        return timestamp;
+        return this.timestamp;
     }
 
     get Editable(){
@@ -37,11 +32,11 @@ export default class WebMessage extends UserMessage {
     }
 
     get EditedTimestamp(){
-        return new Date(this.RawMessage.editedTimestamp);
+        return this.timestamp;
     }
 
     get Edits(){
-        return this.RawMessage.edits;
+        return 0;
     }
 
     isMentioned(user){

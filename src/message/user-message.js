@@ -1,5 +1,3 @@
-import { Attachment } from "discord.js";
-
 export default class UserMessage {
     /* 클라이언트 메세지 wrapper 클래스
      * 
@@ -20,7 +18,7 @@ export default class UserMessage {
     }
 
     get Text(){
-        return "";
+        return '';
     }
 
     get Timestamp(){

@@ -1,4 +1,5 @@
 import Client, { ClientUser } from "./client";
+import http from 'http';
 import SocketServer from "socket.io";
 import WebChannel from "../channel/web-channel";
 import { EventEmitter } from "events";
@@ -11,6 +12,7 @@ export default class WebClient extends Client {
 
         this.port = 0;
 
+        this.httpServer = null;
         this.server = null;
         this.handler = new WebHandler(this);
 
@@ -66,15 +68,21 @@ export default class WebClient extends Client {
         this.initializing = true;
         
         this.port = port || 7000;
-        this.server = new SocketServer({
+        this.httpServer = http.createServer();
+        this.server = new SocketServer(this.httpServer, {
+            path: WebClient.DEFAULTPATH,
             serveClient: false
         });
-        this.server.listen(this.port);
+        this.httpServer.listen(this.port);
 
         await this.handler.initialize();
 
         this.initializing = false;
         this.ready = true;
+
+        console.log(`Web 클라이언트가 포트 ${this.port} 로 초기화 되었습니다`);
+
+        return this.server;
     }
 
     async createChannel(name){
@@ -95,6 +103,7 @@ export default class WebClient extends Client {
         
     }
 }
+WebClient.DEFAULTPATH = '/storybot-web';
 
 export class WebClientUser extends ClientUser {
     get Id(){
@@ -128,8 +137,12 @@ export class WebHandler {
         return this.WebClient.Server;
     }
 
+    get BotSocket() {
+        return this.SocketServer.sockets;
+    }
+
     async initialize() {
-        this.SocketServer.sockets.on('connection', this.onConnected.bind(this));
+        this.BotSocket.on('connect', this.onConnected.bind(this));
     }
 
     onConnected(socket) {
@@ -140,14 +153,14 @@ export class WebHandler {
         /*
         {
             "namespace": "asdf",
-            "service": "kakao bot"
+            "service": "kakao bot",
             "id": 8176289391423 <- this is unique id
         }
         */
         socket.on('initialize', (jsonData) => {
             try {
                 if (!handler.Initialized) {
-                    handler.initialize(jsonData.namespace, jsonData.serviceDesc);
+                    handler.initialize(jsonData.namespace, jsonData.service);
 
                     console.log(`socket ${socket.id} is initialized to namespace: ${handler.Namespace}, service: ${handler.ServiceDesc}`);
                 }
@@ -163,6 +176,7 @@ export class WebHandler {
 
 export class SocketHandler extends EventEmitter {
     constructor(webClient, socket, namespace) {
+        super();
         this.webClient = webClient;
         this.socket = socket;
 
@@ -243,13 +257,13 @@ export class SocketHandler extends EventEmitter {
                 channel = this.addChannel(rawChannel.id);
             }
 
-            if (rawMessage.Text) {
-                var message = new WebMessage(rawMessage.Text, rawMessage.timestamp, channel, user);
+            if (rawMessage.text) {
+                var message = new WebMessage(rawMessage.text, rawMessage.timestamp, channel, user);
 
                 this.emit('message', message);
                 this.WebClient.emit('message', message);
-                this.channel.emit('message', message);
-                this.user.emit('message', message);
+                channel.emit('message', message);
+                user.emit('message', message);
             }
 
             for (var attachment of rawMessage.attachments) {
@@ -257,8 +271,8 @@ export class SocketHandler extends EventEmitter {
 
                 this.emit('message', message);
                 this.WebClient.emit('message', message);
-                this.channel.emit('message', message);
-                this.user.emit('message', message);
+                channel.emit('message', message);
+                user.emit('message', message);
             }
 
         } catch (e) {
@@ -293,7 +307,7 @@ export class SocketHandler extends EventEmitter {
     }
 
     addChannel(channelId) {
-        if (!this.hasChannel(channelId))
+        if (this.hasChannel(channelId))
             return this.getChannel(channelId);
             
         var webChannel = new WebChannel(this.WebClient, this, channelId, "Unknown");
@@ -311,7 +325,7 @@ export class SocketHandler extends EventEmitter {
     }
 
     hasChannel(channelId) {
-        return this.channelMap.has(id);
+        return this.channelMap.has(channelId);
     }
 
     getWrappedUser(userId, name) {
@@ -331,7 +345,7 @@ export class SocketHandler extends EventEmitter {
     }
 
     onDisconnect() {
-        console.log(socket.id + " is disconnected from storybot");
+        console.log(this.Socket.id + " is disconnected from storybot");
 
         this.WebClient.removeSocketHandler(this);
     }
