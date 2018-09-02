@@ -29,7 +29,7 @@ export default class WebChannel extends Channel {
                 'channel': this.Id,
                 'user': {
                     'id': this.Handler.WebClient.ClientUser.Id,
-                    'name': this.Handler.WebClient.ClientUser.Name
+                    'nickname': this.Handler.WebClient.ClientUser.Name
                 },
                 'type': 'text',
                 'text': msgTemplate.Text
@@ -47,7 +47,7 @@ export default class WebChannel extends Channel {
                 'channel': this.Id,
                 'user': {
                     'id': this.Handler.WebClient.ClientUser.Id,
-                    'name': this.Handler.WebClient.ClientUser.Name
+                    'nickname': this.Handler.WebClient.ClientUser.Name
                 },
                 'type': 'attachment'
             }, attachment.Buffer);
