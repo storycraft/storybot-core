@@ -1,9 +1,10 @@
-import Client, { ChatHandler, ClientUser } from './client';
+import Client, { ClientHandler } from './client';
 
 import Discord from 'discord.js';
 import DiscordUser from '../user/discord-user';
 import DiscordMessage from '../message/discord-message';
 import DiscordChannel, { DiscordDMChannel } from '../channel/discord-channel';
+import DiscordClientUser from './user/discord-client-user';
 
 export default class DiscordClient extends Client {
     constructor(){
@@ -11,6 +12,7 @@ export default class DiscordClient extends Client {
         //내부 discord.js 객체
         this.discord = null;
 
+        this.user = null;
         this.channels = new Map();
         this.users = new Map();
     }
@@ -47,10 +49,6 @@ export default class DiscordClient extends Client {
         return this.discord;
     }
 
-    get ClientUser(){
-        return this.user;
-    }
-
     get Handler(){
         return this.handler;
     }
@@ -79,6 +77,10 @@ export default class DiscordClient extends Client {
 
     async setStatus(statusString){
         await this.ClientUser.DiscordUser.setStatus(statusString);
+    }
+
+    async setActivity(app, option) {
+        await this.ClientUser.DiscordUser.setActivity(app, option);
     }
 
     get Presence(){
@@ -139,7 +141,7 @@ export default class DiscordClient extends Client {
     }
 }
 
-class DiscordChatHandler extends ChatHandler {
+class DiscordChatHandler extends ClientHandler {
     constructor(client){
         super(client);
 
@@ -166,41 +168,5 @@ class DiscordChatHandler extends ChatHandler {
 
     destroy(){
 
-    }
-}
-
-class DiscordClientUser extends ClientUser {
-    constructor(user){
-        super();
-        this.discordUser = user;
-    }
-
-    get DiscordUser(){
-        return this.discordUser;
-    }
-
-    get Id(){
-        return this.DiscordUser.id;
-    }
-
-    get Tag(){
-        return this.DiscordUser.tag;
-    }
-
-    get IdentityId(){
-        return `discord:${this.Id}`;
-    }
-
-    get Name(){
-        return this.DiscordUser.username;
-    }
-
-    get HasDMChannel(){
-        return !!(this.dmChan);
-    }
-
-    async getDMChannel(){
-        //DM Channel이 없을 경우 만든 후 캐싱
-        return this.dmChan || (this.dmChan = await this.DiscordUser.createDM());
     }
 }

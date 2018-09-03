@@ -1,12 +1,13 @@
-import Client, { ClientUser } from "./client";
+import Client, { ClientHandler } from "./client";
 import http from 'http';
 import SocketServer from "socket.io";
-import WebChannel from "../channel/web-channel";
+import SocketChannel from "../channel/socket-channel";
 import { EventEmitter } from "events";
-import WebMessage from "../message/web-message";
-import WebUser from "../user/web-user";
+import SocketMessage from "../message/socket-message";
+import SocketUser from "../user/socket-user";
+import SocketClientUser from "./user/socket-client-user";
 
-export default class WebClient extends Client {
+export default class SocketClient extends Client {
     constructor() {
         super();
 
@@ -14,10 +15,12 @@ export default class WebClient extends Client {
 
         this.httpServer = null;
         this.server = null;
-        this.handler = new WebHandler(this);
+        this.handler = new SocketClientHandler(this);
 
         this.socketMap = new Map();
-        this.user = new WebClientUser(this);
+        this.user = new SocketClientUser(this);
+
+        this.clientMap = new Map();
     }
 
     get Port(){
@@ -30,6 +33,26 @@ export default class WebClient extends Client {
 
     get Server(){
         return this.server;
+    }
+
+    hasClientId(uuid) {
+        return this.clientMap.has(uuid);
+    }
+
+    registerClientId(uuid, namespace) {
+        if (this.hasClientId(uuid)) {
+            var namespace = this.getClientNamespace(uuid);
+            throw new Error(`${uuid} already taken by ${namespace}`);
+        }
+
+        this.clientMap.set(uuid, namespace);
+    }
+
+    getClientNamespace(uuid) {
+        if (!this.hasClientId(uuid))
+            return null;
+
+        return this.clientMap.get(uuid);
     }
 
     addSocketHandler(socket) {
@@ -62,7 +85,7 @@ export default class WebClient extends Client {
         return true;
     }
 
-    async initialize(port){
+    async initialize(port, path){
         if (this.Ready || this.Initializing)
             throw new Error('해당 클라이언트는 이미 활성화 되어있거나 초기화 중입니다');
         this.initializing = true;
@@ -70,7 +93,7 @@ export default class WebClient extends Client {
         this.port = port || 7000;
         this.httpServer = http.createServer();
         this.server = new SocketServer(this.httpServer, {
-            path: WebClient.DEFAULTPATH,
+            path: path || '/storybot-socket',
             serveClient: false
         });
         this.httpServer.listen(this.port);
@@ -80,7 +103,7 @@ export default class WebClient extends Client {
         this.initializing = false;
         this.ready = true;
 
-        console.log(`Web 클라이언트가 포트 ${this.port} 로 초기화 되었습니다`);
+        console.log(`Socket 클라이언트가 포트 ${this.port} 로 초기화 되었습니다`);
 
         return this.server;
     }
@@ -103,38 +126,14 @@ export default class WebClient extends Client {
         
     }
 }
-WebClient.DEFAULTPATH = '/storybot-web';
 
-export class WebClientUser extends ClientUser {
-    get Id(){
-        return -1;
-    }
-
-    //클라이언트간 구분 가능한 Id
-    get IdentityId(){
-        return "web:" + this.Id;
-    }
-
-    get Name(){
-        return 'Storybot';
-    }
-
-    get HasDMChannel(){
-        return false;
-    }
-}
-
-export class WebHandler {
-    constructor(webClient) {
-        this.webClient = webClient;
-    }
-
-    get WebClient(){
-        return this.webClient;
+export class SocketClientHandler extends ClientHandler {
+    constructor(socketclient) {
+        super(socketclient);
     }
 
     get SocketServer(){
-        return this.WebClient.Server;
+        return this.Client.Server;
     }
 
     get BotSocket() {
@@ -148,19 +147,43 @@ export class WebHandler {
     onConnected(socket) {
         console.log(socket.id + " is connected to storybot");
 
-        var handler = this.WebClient.addSocketHandler(socket);
+        var handler = this.Client.addSocketHandler(socket);
 
         /*
+        get
+
         {
+            "client-uuid": "73ace10f-b60c-4d7f-96a5-0c2f479959bd", <- this is unique id
+            "service": "socket testing"
+        }
+        */
+
+        /*
+        response
+
+        {
+            "status": 0, //0 on success 1 on failed
             "namespace": "asdf",
-            "service": "kakao bot",
-            "id": 8176289391423 <- this is unique id
         }
         */
         socket.on('initialize', (jsonData) => {
             try {
                 if (!handler.Initialized) {
-                    handler.initialize(jsonData.namespace, jsonData.service);
+                    var clientId = jsonData['client-uuid'];
+                    if (!this.Client.hasClientId(clientId)) {
+                        handler.Socket.emit('initialize', {
+                            status: 1
+                        });
+
+                        throw new Error(`Unknown socket client ${clientId} rejecting`);
+                    }
+
+                    var namespace = this.Client.getClientNamespace(clientId);
+                    handler.initialize(namespace, jsonData.service);
+                    handler.Socket.emit('initialize', {
+                        status: 0,
+                        namespace: namespace
+                    });
 
                     console.log(`socket ${socket.id} is initialized to namespace: ${handler.Namespace}, service: ${handler.ServiceDesc}`);
                 }
@@ -175,12 +198,12 @@ export class WebHandler {
 }
 
 export class SocketHandler extends EventEmitter {
-    constructor(webClient, socket, namespace) {
+    constructor(socketClient, socket, namespace = null) {
         super();
-        this.webClient = webClient;
+        this.socketClient = socketClient;
         this.socket = socket;
 
-        this.namespace = null;
+        this.namespace = namespace;
         this.serviceDesc = null;
         this.initialized = false;
 
@@ -207,8 +230,8 @@ export class SocketHandler extends EventEmitter {
         return this.serviceDesc;
     }
 
-    get WebClient() {
-        return this.webClient;
+    get SocketClient() {
+        return this.socketClient;
     }
 
     initialize(namespace, serviceDesc) {
@@ -258,19 +281,19 @@ export class SocketHandler extends EventEmitter {
             }
 
             if (rawMessage.text) {
-                var message = new WebMessage(rawMessage.text, rawMessage.timestamp, channel, user);
+                var message = new SocketMessage(rawMessage.text, rawMessage.timestamp, channel, user);
 
                 this.emit('message', message);
-                this.WebClient.emit('message', message);
+                this.SocketClient.emit('message', message);
                 channel.emit('message', message);
                 user.emit('message', message);
             }
 
             for (var attachment of rawMessage.attachments) {
-                var message = new WebMessage('', rawMessage.timestamp, channel, user);
+                var message = new SocketMessage('', rawMessage.timestamp, channel, user);
 
                 this.emit('message', message);
-                this.WebClient.emit('message', message);
+                this.SocketClient.emit('message', message);
                 channel.emit('message', message);
                 user.emit('message', message);
             }
@@ -314,11 +337,11 @@ export class SocketHandler extends EventEmitter {
         if (this.hasChannel(channelId))
             return this.getChannel(channelId);
             
-        var webChannel = new WebChannel(this.WebClient, this, channelId, name ? name : 'Unknown Channel');
+        var socketChannel = new SocketChannel(this.SocketClient, this, channelId, name ? name : 'Unknown Channel');
 
-        this.channelMap.set(channelId, webChannel);
+        this.channelMap.set(channelId, socketChannel);
 
-        return webChannel;
+        return socketChannel;
     }
 
     getChannel(channelId, updateName) {
@@ -330,6 +353,7 @@ export class SocketHandler extends EventEmitter {
         if (updateName) {
             channel.updateName(updateName);
         }
+
         return channel;
     }
 
@@ -338,8 +362,8 @@ export class SocketHandler extends EventEmitter {
     }
 
     getWrappedUser(userId, name) {
-        if (userId == this.WebClient.ClientUser.Id)
-            return this.WebClient.ClientUser;
+        if (userId == this.SocketClient.ClientUser.Id)
+            return this.SocketClient.ClientUser;
 
         if (this.userMap.has(userId)) {
             var user = this.userMap.get(userId);
@@ -348,7 +372,7 @@ export class SocketHandler extends EventEmitter {
             return user;
         }
 
-        var user = new WebUser(userId, this.Namespace, name ? name : 'Unknown User');
+        var user = new SocketUser(userId, this.Namespace, name ? name : 'Unknown User');
         this.userMap.set(userId, user);
         return user;
     }
@@ -356,6 +380,6 @@ export class SocketHandler extends EventEmitter {
     onDisconnect() {
         console.log(this.Socket.id + " is disconnected from storybot");
 
-        this.WebClient.removeSocketHandler(this);
+        this.SocketClient.removeSocketHandler(this);
     }
 }

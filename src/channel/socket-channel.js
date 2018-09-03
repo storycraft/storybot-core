@@ -1,8 +1,8 @@
 import Channel from "./channel";
-import WebMessage from "../message/web-message";
+import SocketMessage from "../message/socket-message";
 import MessageTemplate from "../message/template/message-template";
 
-export default class WebChannel extends Channel {
+export default class SocketChannel extends Channel {
     constructor(client, handler, id, name){
         super(client, id, name);
 
@@ -13,10 +13,6 @@ export default class WebChannel extends Channel {
         return this.handler;
     }
 
-    async getMembers(){
-        return [/*User*/];
-    }
-
     async send(msgTemplate){
         if (typeof(msgTemplate) == 'string'){
             msgTemplate = new MessageTemplate(msgTemplate);
@@ -25,17 +21,18 @@ export default class WebChannel extends Channel {
         var messageList = [];
 
         if (msgTemplate.Text) {
+            var message = new SocketMessage(msgTemplate.Text, new Date(), this, this.Client.ClientUser);
+
             this.Handler.Socket.emit('message', {
                 'channel': this.Id,
                 'user': {
-                    'id': this.Handler.WebClient.ClientUser.Id,
-                    'nickname': this.Handler.WebClient.ClientUser.Name
+                    'id': message.User.Id,
+                    'nickname': message.User.Name
                 },
                 'type': 'text',
                 'text': msgTemplate.Text
             });
 
-            var message = new WebMessage(msgTemplate.Text, new Date(), this, this.Handler.WebClient.ClientUser);
             this.Client.emit('message', message);
             message.User.emit('message', message);
             this.Handler.emit('message', message);
@@ -43,16 +40,16 @@ export default class WebChannel extends Channel {
         }
 
         for (let attachment of msgTemplate.Attachments) {
+            var message = new SocketMessage('', new Date(), this, this.Client.ClientUser);
             this.Handler.Socket.emit('message', {
                 'channel': this.Id,
                 'user': {
-                    'id': this.Handler.WebClient.ClientUser.Id,
-                    'nickname': this.Handler.WebClient.ClientUser.Name
+                    'id': message.User.Id,
+                    'nickname': message.User.Name
                 },
                 'type': 'attachment'
             }, attachment.Buffer);
 
-            var message = new WebMessage('', new Date(), this, this.Handler.WebClient.ClientUser);
             this.Client.emit('message', message);
             message.User.emit('message', message);
             this.Handler.emit('message', message);

@@ -1,6 +1,6 @@
 import UserMessage from "./user-message";
 
-export default class WebMessage extends UserMessage {
+export default class SocketMessage extends UserMessage {
     constructor(text, timestamp, source, user){
         super(user);
 

@@ -14,7 +14,11 @@ export default class DiscordChannel extends Channel {
         return this.textChannel;
     }
 
-    async getMembers(){
+    get CanGetMemberList() {
+        return true;
+    }
+
+    async getMemberList(){
         var members = [];
 
         for (let [snowflake, member] of this.TextChannel.members){

@@ -51,7 +51,7 @@ export default class Client extends EventEmitter {
     }
 }
 
-export class ChatHandler {
+export class ClientHandler {
     constructor(client){
         this.client = client;
     }

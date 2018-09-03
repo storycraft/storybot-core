@@ -21,7 +21,11 @@ export default class Channel extends EventEmitter {
         return this.name;
     }
 
-    async getMembers(){
+    get CanGetMemberList() {
+        return false;
+    }
+
+    async getMemberList(){
         return [/*User*/];
     }
 

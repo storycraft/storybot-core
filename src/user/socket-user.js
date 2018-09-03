@@ -1,5 +1,5 @@
 import User from './user';
-export default class WebUser extends User {
+export default class SocketUser extends User {
     constructor(id, namespace, name){
         super();
 
@@ -13,7 +13,7 @@ export default class WebUser extends User {
     }
 
     get IdentityId(){
-        return `web_${this.namespace}:${this.Id}`;
+        return `socket_${this.namespace}:${this.Id}`;
     }
 
     get Name(){
@@ -29,7 +29,7 @@ export default class WebUser extends User {
     }
 
     async send(msgTemplate){
-        throw new Error("Cannot DM to Web User");
+        throw new Error("Cannot DM to Socket User");
     }
 
     updateName(name) {
