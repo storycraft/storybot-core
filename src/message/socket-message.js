@@ -40,7 +40,7 @@ export default class SocketMessage extends UserMessage {
     }
 
     isMentioned(user){
-        return false;
+        return this.Text.includes(`@${user.Name}`);
     }
 
     async reply(msgTemplate){

@@ -5,6 +5,7 @@ import CommandManager from './command/command-manager';
 import FirebaseManager from './io/firebase/firebase-manager';
 import User from './user/user';
 import SocketClient from './client/socket-client';
+import AddonManager from './addon/addon-manager';
 
 export default class Bot extends EventEmitter {
     constructor(){
@@ -18,6 +19,7 @@ export default class Bot extends EventEmitter {
         this.clients = [];
 
         this.commandManager = new CommandManager(this);
+        this.addonManager = new AddonManager(this);
         this.firebaseManager = new FirebaseManager();
     }
 
