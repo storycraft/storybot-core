@@ -1,4 +1,5 @@
 import UserMessage from "./user-message";
+import Bot from "../bot";
 
 export default class SocketMessage extends UserMessage {
     constructor(text, timestamp, source, user){
@@ -40,6 +41,10 @@ export default class SocketMessage extends UserMessage {
     }
 
     isMentioned(user){
+        if (user instanceof Bot){
+            user = user.SocketClient.ClientUser;
+        }
+
         return this.Text.includes(`@${user.Name}`);
     }
 

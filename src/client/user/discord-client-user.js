@@ -19,7 +19,7 @@ export default class DiscordClientUser extends ClientUser {
     }
 
     get IdentityId(){
-        return `discord:${this.Id}`;
+        return `discord_client:${this.Id}`;
     }
 
     get Name(){

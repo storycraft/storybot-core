@@ -13,7 +13,7 @@ export default class SocketUser extends User {
     }
 
     get IdentityId(){
-        return `socket_${this.namespace}:${this.Id}`;
+        return `socket_user_${this.namespace}:${this.Id}`;
     }
 
     get Name(){

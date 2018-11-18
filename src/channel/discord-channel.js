@@ -14,6 +14,10 @@ export default class DiscordChannel extends Channel {
         return this.textChannel;
     }
 
+    get IdentityId(){
+        return `discord_channel:${this.Id}`;
+    }
+
     get CanGetMemberList() {
         return true;
     }
@@ -37,26 +41,22 @@ export default class DiscordChannel extends Channel {
         var messages = [];
 
         //텍스트 입력 효과
+        this.TextChannel.startTyping();
+
         if (msgTemplate.Text){
-            this.TextChannel.startTyping();
 
             let sendQueue = this.TextChannel.send(msgTemplate.Text || '');
 
-            this.TextChannel.stopTyping();
             var message = DiscordMessage.fromRawDiscordMessage(this, this.Client.ClientUser, await sendQueue);
-            this.Client.emit('message', message);
-            message.User.emit('message', message);
-            this.emit('message', message);
             messages.push(message);
         }
 
         for(let attachment of msgTemplate.Attachments){
             var message = DiscordMessage.fromRawDiscordMessage(this, this.Client.ClientUser, await this.TextChannel.send('', new Attachment(attachment.Buffer, attachment.Name)));
             messages.push(message);
-            this.Client.emit('message', message);
-            message.User.emit('message', message);
-            this.emit('message', message);
         }
+
+        this.TextChannel.stopTyping();
 
         return messages;
     }

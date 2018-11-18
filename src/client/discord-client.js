@@ -53,6 +53,10 @@ export default class DiscordClient extends Client {
         return this.handler;
     }
 
+    get ClientName() {
+        return 'DiscordClient';
+    }
+
     //Discord User 관련 부분 시작
 
     get UserName(){

@@ -24,7 +24,7 @@ export default class DiscordUser extends User {
     }
 
     get IdentityId(){
-        return `discord:${this.Id}`;
+        return `discord_user:${this.Id}`;
     }
 
     get Name(){

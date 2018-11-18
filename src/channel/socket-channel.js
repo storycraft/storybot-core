@@ -13,6 +13,10 @@ export default class SocketChannel extends Channel {
         return this.handler;
     }
 
+    get IdentityId(){
+        return `socket_channel_${this.Handler.Namespace}:${this.Id}`;
+    }
+
     async send(msgTemplate){
         if (typeof(msgTemplate) == 'string'){
             msgTemplate = new MessageTemplate(msgTemplate);
@@ -36,6 +40,7 @@ export default class SocketChannel extends Channel {
             this.Client.emit('message', message);
             message.User.emit('message', message);
             this.Handler.emit('message', message);
+            this.emit('message', message);
             messageList.push(message);
         }
 
@@ -53,6 +58,7 @@ export default class SocketChannel extends Channel {
             this.Client.emit('message', message);
             message.User.emit('message', message);
             this.Handler.emit('message', message);
+            this.emit('message', message);
             messageList.push(message);
         }
 

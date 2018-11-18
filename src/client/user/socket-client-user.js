@@ -7,7 +7,7 @@ export default class SocketClientUser extends ClientUser {
 
     //클라이언트간 구분 가능한 Id
     get IdentityId(){
-        return "socket:" + this.Id;
+        return "socket_client:" + this.Id;
     }
 
     get Name(){

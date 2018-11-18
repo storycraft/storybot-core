@@ -90,6 +90,8 @@ export default class Bot extends EventEmitter {
     }
 
     onMessage(msg){
+        console.log(`${msg.Timestamp} | from ${msg.Source.Id} (${msg.Source.Name}) -> ${msg.User.IdentityId} (${msg.User.Name}) : ${msg.Text}`);
+
         this.emit('message', msg);
     }
 
@@ -104,6 +106,9 @@ export default class Bot extends EventEmitter {
 
         if (this.facebookMessenger)
             tasks.push(this.facebookMessenger.destroy());
+
+        if (this.socket)
+            tasks.push(this.socket.destroy());
 
         await Promise.all(tasks);
     }

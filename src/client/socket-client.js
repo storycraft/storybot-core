@@ -27,6 +27,10 @@ export default class SocketClient extends Client {
         return this.port;
     }
 
+    get ClientName() {
+        return 'SocketClient';
+    }
+
     get Handler(){
         return this.handler;
     }
@@ -272,14 +276,8 @@ export class SocketHandler extends EventEmitter {
 
             var user = this.getWrappedUser(rawUser.id, rawUser.nickname);
 
-            var channel = null;
-            if (this.hasChannel(rawChannel.id)) {
-                channel = this.getChannel(rawChannel.id, rawChannel.name);
-            }
-            else {
-                channel = this.addChannel(rawChannel.id, rawChannel.name);
-            }
-
+            var channel = this.getChannel(rawChannel.id, rawChannel.name);
+            
             if (rawMessage.text) {
                 var message = new SocketMessage(rawMessage.text, rawMessage.timestamp, channel, user);
 
@@ -333,28 +331,21 @@ export class SocketHandler extends EventEmitter {
         }
     }
 
-    addChannel(channelId, name) {
-        if (this.hasChannel(channelId))
-            return this.getChannel(channelId);
+    getChannel(channelId, name) {
+        if (this.hasChannel(channelId)) {
+            var channel = this.channelMap.get(channelId);
+
+            if (name)
+                channel.updateName(name);
+    
+            return channel;
+        }
             
         var socketChannel = new SocketChannel(this.SocketClient, this, channelId, name ? name : 'Unknown Channel');
 
         this.channelMap.set(channelId, socketChannel);
 
         return socketChannel;
-    }
-
-    getChannel(channelId, updateName) {
-        if (!this.hasChannel(channelId))
-            return null;
-
-        var channel = this.channelMap.get(channelId);
-
-        if (updateName) {
-            channel.updateName(updateName);
-        }
-
-        return channel;
     }
 
     hasChannel(channelId) {

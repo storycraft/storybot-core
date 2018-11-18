@@ -17,6 +17,10 @@ export default class Channel extends EventEmitter {
         return this.id;
     }
 
+    get IdentityId(){
+        return this.Id;
+    }
+
     get Name(){
         return this.name;
     }
