@@ -279,7 +279,7 @@ export class SocketHandler extends EventEmitter {
             var channel = this.getChannel(rawChannel.id, rawChannel.name);
             
             if (rawMessage.text) {
-                var message = new SocketMessage(rawMessage.text, rawMessage.timestamp, channel, user);
+                var message = new SocketMessage(rawMessage.text, new Date(rawMessage.timestamp), channel, user);
 
                 this.emit('message', message);
                 this.SocketClient.emit('message', message);
@@ -288,7 +288,7 @@ export class SocketHandler extends EventEmitter {
             }
 
             for (var attachment of rawMessage.attachments) {
-                var message = new SocketMessage('', rawMessage.timestamp, channel, user);
+                var message = new SocketMessage('', new Date(rawMessage.timestamp), channel, user);
 
                 this.emit('message', message);
                 this.SocketClient.emit('message', message);

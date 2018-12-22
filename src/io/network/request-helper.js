@@ -4,12 +4,12 @@ import https from 'https';
 import { URL } from 'url';
 
 export default class RequestHelper {
-    static async get(requestUrl){
-        return await RequestHelper.request(new URL(requestUrl), null, RequestHelper.isHttps(requestUrl));
+    static async get(requestUrl, isHttps){
+        return await RequestHelper.request(new URL(requestUrl), null, isHttps || RequestHelper.isHttps(requestUrl));
     }
 
     static async post(requestUrl, data, isHttps){
-        return await RequestHelper.request(new URL(requestUrl), data, RequestHelper.isHttps(requestUrl));
+        return await RequestHelper.request(new URL(requestUrl), data, isHttps || RequestHelper.isHttps(requestUrl));
     }
 
     static async request(option, data, isHttps){

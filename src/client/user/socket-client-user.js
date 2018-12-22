@@ -1,6 +1,7 @@
 import { ClientUser } from "../client";
 
 export default class SocketClientUser extends ClientUser {
+    
     get Id(){
         return -1;
     }
