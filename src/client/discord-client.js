@@ -57,6 +57,10 @@ export default class DiscordClient extends Client {
         return 'DiscordClient';
     }
 
+    get ClientInfo() {
+        return `${this.ClientName} with user ${this.UserName} ${this.ClientUser.Id}`;
+    }
+
     //Discord User 관련 부분 시작
 
     get UserName(){

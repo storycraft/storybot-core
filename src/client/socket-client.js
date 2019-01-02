@@ -31,6 +31,10 @@ export default class SocketClient extends Client {
         return 'SocketClient';
     }
 
+    get ClientInfo() {
+        return `${this.ClientName} with client id: ${Array.from(this.clientMap.values()).join(', ')}`;
+    }
+
     get Handler(){
         return this.handler;
     }

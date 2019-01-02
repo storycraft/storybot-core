@@ -29,6 +29,10 @@ export default class Client extends EventEmitter {
         return 'Client';
     }
 
+    get ClientInfo() {
+        return this.ClientName;
+    }
+
     get ClientUser(){
         return this.user;
     }
