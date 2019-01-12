@@ -41,22 +41,33 @@ export default class DiscordChannel extends Channel {
         var messages = [];
 
         //텍스트 입력 효과
-        this.TextChannel.startTyping();
+        this.TextChannel.startTyping(5);
 
-        if (msgTemplate.Text){
+        try {
+            if (msgTemplate.Text){
+                var text = msgTemplate.Text;
 
-            let sendQueue = this.TextChannel.send(msgTemplate.Text || '');
-
-            var message = DiscordMessage.fromRawDiscordMessage(this, this.Client.ClientUser, await sendQueue);
-            messages.push(message);
+                if (text != '') {
+                    if (text.length > 2000) {
+                        text = `${text.slice(0, 1975)}...`; 
+                    }
+        
+                    let sendQueue = this.TextChannel.send(text);
+        
+                    var message = DiscordMessage.fromRawDiscordMessage(this, this.Client.ClientUser, await sendQueue);
+                    messages.push(message);
+                }
+            }
+    
+            for(let attachment of msgTemplate.Attachments){
+                var message = DiscordMessage.fromRawDiscordMessage(this, this.Client.ClientUser, await this.TextChannel.send('', new Attachment(attachment.Buffer, attachment.Name)));
+                messages.push(message);
+            }
+        } catch (e) {
+            console.log(`${this.IdentityId} 채널 메세지 전송 중 오류 발생: ${e}`);
         }
 
-        for(let attachment of msgTemplate.Attachments){
-            var message = DiscordMessage.fromRawDiscordMessage(this, this.Client.ClientUser, await this.TextChannel.send('', new Attachment(attachment.Buffer, attachment.Name)));
-            messages.push(message);
-        }
-
-        this.TextChannel.stopTyping();
+        this.TextChannel.stopTyping(true);
 
         return messages;
     }
