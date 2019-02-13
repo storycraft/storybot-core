@@ -92,7 +92,7 @@ export default class Bot extends EventEmitter {
     get ClientList() {
         return this.clients.slice();
     }
-
+    
     onMessage(msg){
         console.log(`${msg.Timestamp} | from ${msg.Source.Id} (${msg.Source.Name}) -> ${msg.User.IdentityId} (${msg.User.Name}) : ${msg.Text}`);
 

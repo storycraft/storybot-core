@@ -1,6 +1,6 @@
 {
   "name": "storybot-core",
-  "version": "1.5.7",
+  "version": "1.5.8",
   "description": "story bot core part",
   "main": "./dist/index.js",
   "scripts": {

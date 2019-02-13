@@ -1,3 +1,5 @@
+import DefaultParser from "./parser/default-parser";
+
 export default class CommandListener {
     constructor(){
 
@@ -10,4 +12,13 @@ export default class CommandListener {
     get Aliases(){
         return [];
     }
+
+    get Parser() {
+        return new DefaultParser();
+    }
+
+    onCommand(args, user, bot, source) {
+
+    }
+    
 }
